@@ -9,8 +9,8 @@ import { WishlistProvider } from './contexts/WishlistContext';
 import { RatingProvider } from './contexts/RatingsContext'; // Add this import
 
 export const metadata: Metadata = {
-  title: 'Art plazaa ',
-  description: 'Your one-stop shop for premium art supplies and stationery',
+  title: 'Silver Shringar ',
+  description: 'Your one-stop shop for premium ',
 };
 
 export default function RootLayout({
