@@ -25,8 +25,8 @@ connectDB();
 
 // ✅ FIXED CORS Configuration
 const allowedOrigins = [
-  'http://localhost:3000',  // Add this
-  'https://localhost:3000',
+  'http://silvershringar.netlify.app',  // Add this
+  'http://localhost:3000',
   // Optional: add more if needed
   process.env.FRONTEND_URL 
 ].filter(Boolean); // Remove any undefined values
@@ -167,7 +167,7 @@ const server = app.listen(PORT, () => {
 
 // Function to ping server and keep it awake (for Render free tier)
 function startKeepAlive() {
-  const url = process.env.RENDER_EXTERNAL_URL || `https://jewelry-fn2q.onrender.com` || `http://localhost:${PORT}`;
+  const url = process.env.RENDER_EXTERNAL_URL || `https://gold-5tbi.onrender.com` || `http://localhost:${PORT}`;
   const interval = 14 * 60 * 1000; // 14 minutes (Render spins down after 15 mins)
   
   console.log(`🔄 Setting up keep-alive for: ${url}`);
