@@ -129,7 +129,7 @@ const PremiumSlider = ({
                 quality={75}
                 loading={index === 0 ? 'eager' : 'lazy'}
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/30 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-black/0 via-black/0 to-transparent"></div>
             </div>
 
             {/* Premium Content Overlay */}
