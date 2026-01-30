@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -30,7 +30,8 @@ interface PaymentData {
   key: string;
 }
 
-export default function PaymentPage() {
+// Create a separate component that uses useSearchParams
+function PaymentPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
@@ -51,7 +52,7 @@ export default function PaymentPage() {
     }
 
     loadPaymentData();
-  }, [orderId]);
+  }, [orderId, router]);
 
   const loadPaymentData = async () => {
     try {
@@ -425,11 +426,32 @@ export default function PaymentPage() {
                 UPI (Google Pay, PhonePe, Paytm), Net Banking, Wallets
               </p>
             </div>
-
-            {/* Note: "Return to Checkout" button has been removed as requested */}
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+// Main component that wraps the content in Suspense
+export default function PaymentPage() {
+  return (
+    <Suspense 
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50 pt-16 md:pt-24">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+            <div className="text-center">
+              <Loader2 className="w-12 h-12 text-purple-600 animate-spin mx-auto mb-4" />
+              <p className="text-gray-600">Loading payment page...</p>
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <PaymentPageContent />
+    </Suspense>
+  );
+}
+
+// Add this to disable static generation for this page
+export const dynamic = 'force-dynamic';
