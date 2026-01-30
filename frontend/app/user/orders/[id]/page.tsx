@@ -442,7 +442,7 @@ export default function OrderDetailsPage() {
                         </p>
                         <p className={`text-sm ${
                           order.paymentStatus === 'paid' ? 'text-green-600' :
-                          order.paymentStatus === 'Cod' ? 'text-yellow-600' :
+                          order.paymentStatus === 'pending' ? 'text-yellow-600' :
                           'text-red-600'
                         }`}>
                           {order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1)}
