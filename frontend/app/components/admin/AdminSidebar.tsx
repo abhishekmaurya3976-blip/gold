@@ -84,12 +84,12 @@ export default function AdminSidebar() {
       href: '/admin/orders', 
       color: 'red' 
     },
-    { 
-      title: 'Payments', 
-      icon: CreditCard, 
-      href: '/admin/payments', 
-      color: 'emerald' 
-    },
+    // { 
+    //   title: 'Payments', 
+    //   icon: CreditCard, 
+    //   href: '/admin/payments', 
+    //   color: 'emerald' 
+    // },
     { 
       title: 'Wishlists', 
       icon: Heart, 

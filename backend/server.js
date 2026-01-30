@@ -18,6 +18,7 @@ const adminOrderRoutes = require('./routes/adminOrderRoutes');
 const reviewRoutes = require('./routes/reviews'); // Add this
 
 
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -106,6 +107,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes); // User orders
 app.use('/api/admin/orders', adminOrderRoutes);
 app.use('/api/reviews', reviewRoutes); // Add this
+
 
 // 404 handler for API routes
 app.use('/api/*', (req, res) => {

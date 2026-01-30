@@ -2,25 +2,26 @@ const Order = require('../models/Order');
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
 const User = require('../models/User');
+const razorpayService = require('../services/razorpayService');
 const mongoose = require('mongoose');
 
-// @desc    Create new order
+// @desc    Create new order (without payment)
 // @route   POST /api/orders
 // @access  Private
 exports.createOrder = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const userId = req.user._id;
     const {
       shippingAddress,
       paymentMethod = 'cod',
-      paymentDetails = {},
       orderNotes = '',
       saveAddress = false
     } = req.body;
 
     console.log('Creating order for user:', userId);
-    console.log('Shipping address:', shippingAddress);
-    console.log('Payment method:', paymentMethod);
 
     // Validate required fields
     if (!shippingAddress || !shippingAddress.firstName || !shippingAddress.lastName ||
@@ -33,7 +34,7 @@ exports.createOrder = async (req, res) => {
     }
 
     // Validate payment method
-    if (!['credit_card', 'upi', 'cod'].includes(paymentMethod)) {
+    if (!['razorpay', 'cod', 'upi'].includes(paymentMethod)) {
       return res.status(400).json({
         success: false,
         message: 'Invalid payment method'
@@ -44,11 +45,10 @@ exports.createOrder = async (req, res) => {
     const cart = await Cart.findOne({ userId }).populate({
       path: 'items.productId',
       select: '_id name price images stock isActive'
-    });
-
-    console.log('Cart found:', cart ? cart.items.length : 0, 'items');
+    }).session(session);
 
     if (!cart || cart.items.length === 0) {
+      await session.abortTransaction();
       return res.status(400).json({
         success: false,
         message: 'Cart is empty'
@@ -60,21 +60,12 @@ exports.createOrder = async (req, res) => {
     const orderItems = [];
 
     for (const item of cart.items) {
-      console.log('Processing cart item:', item);
-      
       if (!item.productId) {
         invalidItems.push('Item with invalid product');
         continue;
       }
 
       const product = item.productId;
-
-      console.log('Product details:', {
-        name: product.name,
-        isActive: product.isActive,
-        stock: product.stock,
-        price: product.price
-      });
 
       if (!product.isActive) {
         invalidItems.push(`${product.name} is not available`);
@@ -95,12 +86,14 @@ exports.createOrder = async (req, res) => {
           ? (typeof product.images[0] === 'string' ? product.images[0] : product.images[0].url)
           : ''
       });
+
+      // Update product stock
+      product.stock -= item.quantity;
+      await product.save({ session });
     }
 
-    console.log('Order items prepared:', orderItems.length);
-    console.log('Invalid items:', invalidItems.length);
-
     if (invalidItems.length > 0) {
+      await session.abortTransaction();
       return res.status(400).json({
         success: false,
         message: 'Some items in your cart are not available',
@@ -109,6 +102,7 @@ exports.createOrder = async (req, res) => {
     }
 
     if (orderItems.length === 0) {
+      await session.abortTransaction();
       return res.status(400).json({
         success: false,
         message: 'No valid items in cart'
@@ -117,27 +111,11 @@ exports.createOrder = async (req, res) => {
 
     // Calculate totals
     const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shippingFee = subtotal > 499 ? 0 : 50; // Free shipping over ₹499
-    const tax = subtotal * 0.18; // 18% GST
+    const shippingFee = subtotal > 499 ? 0 : 50;
+    const tax = subtotal * 0.18;
     const total = subtotal + shippingFee + tax;
 
-    console.log('Calculated totals:', { subtotal, shippingFee, tax, total });
-
-    // Prepare payment details
-    const paymentInfo = {
-      method: paymentMethod,
-      status: paymentMethod === 'cod' ? 'pending' : 'paid'
-    };
-
-    // Add payment-specific details
-    if (paymentMethod === 'upi' && paymentDetails.upiId) {
-      paymentInfo.upiId = paymentDetails.upiId;
-    } else if (paymentMethod === 'credit_card' && paymentDetails.cardNumber) {
-      paymentInfo.cardLastFour = paymentDetails.cardNumber.slice(-4);
-      paymentInfo.transactionId = `TXN${Date.now()}`;
-    }
-
-    // Create order
+    // Create order with pending payment
     const order = new Order({
       userId,
       items: orderItems,
@@ -153,8 +131,11 @@ exports.createOrder = async (req, res) => {
         zipCode: shippingAddress.zipCode,
         country: shippingAddress.country || 'India'
       },
-      payment: paymentInfo,
-      orderStatus: 'pending',
+      payment: {
+        method: paymentMethod,
+        status: paymentMethod === 'cod' ? 'pending' : 'pending'
+      },
+      orderStatus: paymentMethod === 'cod' ? 'confirmed' : 'pending',
       subtotal,
       shippingFee,
       tax,
@@ -162,23 +143,10 @@ exports.createOrder = async (req, res) => {
       orderNotes: orderNotes || ''
     });
 
-    console.log('Order object created, saving...');
-
-    // Save order
-    const savedOrder = await order.save();
-    console.log('Order saved with ID:', savedOrder._id);
-
-    // Update product stock
-    for (const item of orderItems) {
-      await Product.findByIdAndUpdate(item.productId, {
-        $inc: { stock: -item.quantity }
-      });
-      console.log(`Updated stock for product ${item.productId}: -${item.quantity}`);
-    }
+    const savedOrder = await order.save({ session });
 
     // Clear user's cart
-    await Cart.findOneAndUpdate({ userId }, { items: [] });
-    console.log('Cart cleared for user:', userId);
+    await Cart.findOneAndUpdate({ userId }, { items: [] }, { session });
 
     // Save address if requested
     if (saveAddress) {
@@ -198,52 +166,156 @@ exports.createOrder = async (req, res) => {
             isDefault: true
           }
         }
-      });
-      console.log('Address saved for user:', userId);
+      }, { session });
     }
 
-    // Populate user for response
-    const populatedOrder = await Order.findById(savedOrder._id)
-      .populate({
-        path: 'user',
-        select: 'name email'
-      })
-      .lean();
+    await session.commitTransaction();
 
-    console.log('Order process completed successfully');
+    // For COD, return success immediately
+    if (paymentMethod === 'cod') {
+      return res.status(201).json({
+        success: true,
+        message: 'Order created successfully',
+        data: {
+          order: {
+            _id: savedOrder._id,
+            orderNumber: savedOrder.orderNumber,
+            orderStatus: savedOrder.orderStatus,
+            paymentStatus: savedOrder.payment.status,
+            total: savedOrder.total,
+            paymentMethod: savedOrder.payment.method
+          },
+          requiresPayment: false
+        }
+      });
+    }
 
-    res.status(201).json({
+    // For Razorpay/UPI, create payment order
+    const razorpayOrder = await razorpayService.createOrder(
+      savedOrder.total,
+      'INR',
+      savedOrder.orderNumber
+    );
+
+    if (!razorpayOrder.success) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to create payment order'
+      });
+    }
+
+    // Update order with Razorpay order ID
+    savedOrder.payment.razorpayOrderId = razorpayOrder.orderId;
+    await savedOrder.save();
+
+    return res.status(201).json({
       success: true,
-      message: 'Order created successfully',
+      message: 'Order created. Please complete payment.',
       data: {
         order: {
-          _id: populatedOrder._id,
-          orderNumber: populatedOrder.orderNumber,
-          userId: populatedOrder.userId,
-          items: populatedOrder.items,
-          shippingAddress: populatedOrder.shippingAddress,
-          payment: populatedOrder.payment,
-          orderStatus: populatedOrder.orderStatus,
-          subtotal: populatedOrder.subtotal,
-          shippingFee: populatedOrder.shippingFee,
-          tax: populatedOrder.tax,
-          total: populatedOrder.total,
-          orderNotes: populatedOrder.orderNotes,
-          createdAt: populatedOrder.createdAt,
-          updatedAt: populatedOrder.updatedAt,
-          user: populatedOrder.user ? {
-            _id: populatedOrder.user._id,
-            name: populatedOrder.user.name,
-            email: populatedOrder.user.email
-          } : null
-        }
+          _id: savedOrder._id,
+          orderNumber: savedOrder.orderNumber,
+          orderStatus: savedOrder.orderStatus,
+          paymentStatus: savedOrder.payment.status,
+          total: savedOrder.total,
+          paymentMethod: savedOrder.payment.method
+        },
+        payment: {
+          razorpayOrderId: razorpayOrder.orderId,
+          amount: razorpayOrder.amount,
+          currency: razorpayOrder.currency,
+          key: process.env.RAZORPAY_KEY_ID || 'rzp_test_SA4QbAArCv61EY'
+        },
+        requiresPayment: true
       }
     });
+
   } catch (error) {
-    console.error('Create order error details:', error);
+    await session.abortTransaction();
+    console.error('Create order error:', error);
     res.status(500).json({
       success: false,
       message: 'Error creating order',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  } finally {
+    session.endSession();
+  }
+};
+
+// @desc    Verify Razorpay payment
+// @route   POST /api/orders/:id/verify-payment
+// @access  Private
+exports.verifyPayment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid order ID'
+      });
+    }
+
+    // Find order
+    const order = await Order.findOne({ 
+      _id: id, 
+      userId: req.user._id,
+      'payment.razorpayOrderId': razorpay_order_id 
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    // Verify payment signature
+    const isValid = razorpayService.verifyPayment(
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature
+    );
+
+    if (!isValid) {
+      // Update order as failed
+      order.payment.status = 'failed';
+      await order.save();
+
+      return res.status(400).json({
+        success: false,
+        message: 'Payment verification failed'
+      });
+    }
+
+    // Update order as paid and confirmed
+    order.payment.status = 'paid';
+    order.payment.razorpayPaymentId = razorpay_payment_id;
+    order.payment.razorpaySignature = razorpay_signature;
+    order.orderStatus = 'confirmed';
+    await order.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Payment verified successfully',
+      data: {
+        order: {
+          _id: order._id,
+          orderNumber: order.orderNumber,
+          orderStatus: order.orderStatus,
+          paymentStatus: order.payment.status,
+          total: order.total
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Verify payment error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error verifying payment',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
@@ -258,15 +330,8 @@ exports.getUserOrders = async (req, res) => {
     const {
       page = 1,
       limit = 10,
-      status,
-      search,
-      startDate,
-      endDate,
-      sortBy = 'createdAt',
-      sortOrder = 'desc'
+      status
     } = req.query;
-
-    console.log('Getting orders for user:', userId);
 
     // Build query
     const query = { userId };
@@ -276,30 +341,8 @@ exports.getUserOrders = async (req, res) => {
       query.orderStatus = status;
     }
 
-    // Date range filter
-    if (startDate || endDate) {
-      query.createdAt = {};
-      if (startDate) {
-        const start = new Date(startDate);
-        start.setHours(0, 0, 0, 0);
-        query.createdAt.$gte = start;
-      }
-      if (endDate) {
-        const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
-        query.createdAt.$lte = end;
-      }
-    }
-
-    // Search by order number
-    if (search && search.trim() !== '') {
-      query.orderNumber = { $regex: search.trim(), $options: 'i' };
-    }
-
     // Calculate pagination
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    const sort = {};
-    sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
     // Get total count
     const total = await Order.countDocuments(query);
@@ -307,22 +350,15 @@ exports.getUserOrders = async (req, res) => {
 
     // Get orders
     const orders = await Order.find(query)
-      .populate({
-        path: 'user',
-        select: 'name email'
-      })
-      .sort(sort)
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit))
       .lean();
-
-    console.log('Found', orders.length, 'orders for user');
 
     // Format response
     const formattedOrders = orders.map(order => ({
       _id: order._id,
       orderNumber: order.orderNumber,
-      userId: order.userId,
       items: order.items.map(item => ({
         productId: item.productId,
         productName: item.productName,
@@ -334,19 +370,10 @@ exports.getUserOrders = async (req, res) => {
       paymentMethod: order.payment.method,
       paymentStatus: order.payment.status,
       orderStatus: order.orderStatus,
-      subtotal: order.subtotal,
-      shippingFee: order.shippingFee,
-      tax: order.tax,
       total: order.total,
-      orderNotes: order.orderNotes,
       createdAt: order.createdAt,
-      updatedAt: order.updatedAt,
       deliveredAt: order.deliveredAt,
-      cancelledAt: order.cancelledAt,
-      user: order.user ? {
-        name: order.user.name,
-        email: order.user.email
-      } : null
+      cancelledAt: order.cancelledAt
     }));
 
     res.status(200).json({
@@ -377,8 +404,6 @@ exports.getOrderById = async (req, res) => {
     const userId = req.user._id;
     const { id } = req.params;
 
-    console.log('Getting order by ID:', id, 'for user:', userId);
-
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
@@ -386,12 +411,7 @@ exports.getOrderById = async (req, res) => {
       });
     }
 
-    const order = await Order.findOne({ _id: id, userId })
-      .populate({
-        path: 'user',
-        select: 'name email phone'
-      })
-      .lean();
+    const order = await Order.findOne({ _id: id, userId }).lean();
 
     if (!order) {
       return res.status(404).json({
@@ -400,13 +420,10 @@ exports.getOrderById = async (req, res) => {
       });
     }
 
-    console.log('Order found:', order.orderNumber);
-
     // Format response
     const formattedOrder = {
       _id: order._id,
       orderNumber: order.orderNumber,
-      userId: order.userId,
       items: order.items.map(item => ({
         productId: item.productId,
         productName: item.productName,
@@ -423,19 +440,13 @@ exports.getOrderById = async (req, res) => {
       tax: order.tax,
       total: order.total,
       orderNotes: order.orderNotes,
-      adminNotes: order.adminNotes,
       trackingNumber: order.trackingNumber,
       shippingProvider: order.shippingProvider,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
       deliveredAt: order.deliveredAt,
       cancelledAt: order.cancelledAt,
-      cancelledReason: order.cancelledReason,
-      user: order.user ? {
-        name: order.user.name,
-        email: order.user.email,
-        phone: order.user.phone
-      } : null
+      cancelledReason: order.cancelledReason
     };
 
     res.status(200).json({
@@ -463,8 +474,6 @@ exports.cancelOrder = async (req, res) => {
     const { id } = req.params;
     const { reason = '' } = req.body;
 
-    console.log('Cancelling order:', id, 'for user:', userId);
-
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
@@ -489,22 +498,34 @@ exports.cancelOrder = async (req, res) => {
       });
     }
 
+    // If paid with Razorpay, initiate refund
+    if (order.payment.method === 'razorpay' && order.payment.status === 'paid') {
+      const refund = await razorpayService.refundPayment(
+        order.payment.razorpayPaymentId,
+        order.total
+      );
+
+      if (!refund.success) {
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to process refund'
+        });
+      }
+    }
+
     // Update order status
     order.orderStatus = 'cancelled';
     order.cancelledAt = new Date();
     order.cancelledReason = reason;
-    order.updatedAt = new Date();
+    order.payment.status = order.payment.method === 'razorpay' ? 'refunded' : 'failed';
     
     await order.save();
-
-    console.log('Order cancelled:', order.orderNumber);
 
     // Restore product stock
     for (const item of order.items) {
       await Product.findByIdAndUpdate(item.productId, {
         $inc: { stock: item.quantity }
       });
-      console.log(`Restored stock for product ${item.productId}: +${item.quantity}`);
     }
 
     res.status(200).json({

@@ -84,7 +84,7 @@ const paymentDetailsSchema = new mongoose.Schema({
   method: {
     type: String,
     required: true,
-    enum: ['credit_card', 'upi', 'cod']
+    enum: ['razorpay', 'cod', 'upi']
   },
   status: {
     type: String,
@@ -92,7 +92,15 @@ const paymentDetailsSchema = new mongoose.Schema({
     enum: ['pending', 'paid', 'failed', 'refunded'],
     default: 'pending'
   },
-  transactionId: {
+  razorpayOrderId: {
+    type: String,
+    default: ''
+  },
+  razorpayPaymentId: {
+    type: String,
+    default: ''
+  },
+  razorpaySignature: {
     type: String,
     default: ''
   },
@@ -117,7 +125,7 @@ const orderSchema = new mongoose.Schema({
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
       const day = date.getDate().toString().padStart(2, '0');
       const random = Math.floor(1000 + Math.random() * 9000);
-      return `ART${year}${month}${day}${random}`;
+      return `JEW${year}${month}${day}${random}`;
     }
   },
   userId: {
@@ -195,26 +203,19 @@ orderSchema.virtual('user', {
   justOne: true
 });
 
-// Virtual for products
-orderSchema.virtual('products', {
-  ref: 'Product',
-  localField: 'items.productId',
-  foreignField: '_id',
-  justOne: false
-});
-
 // Indexes for better query performance
 orderSchema.index({ userId: 1, createdAt: -1 });
 orderSchema.index({ orderNumber: 1 });
 orderSchema.index({ orderStatus: 1 });
 orderSchema.index({ 'payment.status': 1 });
 orderSchema.index({ createdAt: -1 });
+orderSchema.index({ 'payment.razorpayOrderId': 1 });
 
 // Static method to calculate order totals
 orderSchema.statics.calculateTotals = function(items) {
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shippingFee = subtotal > 499 ? 0 : 50; // Free shipping over ₹499
-  const tax = subtotal * 0.18; // 18% GST
+  const shippingFee = subtotal > 499 ? 0 : 50;
+  const tax = subtotal * 0.18;
   const total = subtotal + shippingFee + tax;
 
   return { subtotal, shippingFee, tax, total };
@@ -225,10 +226,13 @@ orderSchema.methods.updateStatus = async function(status, notes = '') {
   this.orderStatus = status;
   this.updatedAt = Date.now();
 
-  if (status === 'delivered') {
+  if (status === 'confirmed') {
+    this.payment.status = 'paid';
+  } else if (status === 'delivered') {
     this.deliveredAt = Date.now();
   } else if (status === 'cancelled') {
     this.cancelledAt = Date.now();
+    this.payment.status = 'refunded';
     if (notes) {
       this.cancelledReason = notes;
     }
@@ -239,11 +243,6 @@ orderSchema.methods.updateStatus = async function(status, notes = '') {
   }
 
   return await this.save();
-};
-
-// Method to cancel order
-orderSchema.methods.cancelOrder = async function(reason = '') {
-  return await this.updateStatus('cancelled', reason);
 };
 
 const Order = mongoose.model('Order', orderSchema);

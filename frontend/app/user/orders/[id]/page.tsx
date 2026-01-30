@@ -1,7 +1,6 @@
-// app/user/orders/[id]/page.tsx - COMPLETE CORRECTED VERSION WITH MODERN TIMELINE
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -23,17 +22,14 @@ import {
   RefreshCw,
   Mail,
   Phone,
-  Star,
-  Download,
-  Share2,
   ChevronDown,
   ChevronUp,
   Check,
   Circle,
-  ArrowRight
+  ArrowRight,
+  ExternalLink
 } from 'lucide-react';
-import { ordersApi } from '../../../lib/api/orders';
-import { useRating } from '../../../contexts/RatingsContext';
+import { checkoutApi } from '../../../lib/api/checkout';
 import { useAuth } from '../../../components/contexts/AuthContext';
 
 interface OrderItem {
@@ -61,7 +57,7 @@ interface Order {
     zipCode: string;
     country: string;
   };
-  paymentMethod: 'credit_card' | 'upi' | 'cod';
+  paymentMethod: 'razorpay' | 'cod' | 'upi';
   paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
   orderStatus: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   subtotal: number;
@@ -81,9 +77,18 @@ interface Order {
 // Timeline steps configuration
 const ORDER_TIMELINE_STEPS = [
   {
+    key: 'pending',
+    label: 'Pending',
+    description: 'Order placed, awaiting payment',
+    icon: Clock,
+    color: 'text-yellow-600',
+    bgColor: 'bg-yellow-100',
+    borderColor: 'border-yellow-200'
+  },
+  {
     key: 'confirmed',
     label: 'Confirmed',
-    description: 'Order has been confirmed',
+    description: 'Payment received, order confirmed',
     icon: CheckCircle,
     color: 'text-blue-600',
     bgColor: 'bg-blue-100',
@@ -126,14 +131,10 @@ export default function OrderDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [printing, setPrinting] = useState(false);
-  const [canReviewItems, setCanReviewItems] = useState<{ [key: string]: boolean }>({});
-  const [checkingReviewStatus, setCheckingReviewStatus] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
-  const invoiceRef = useRef<HTMLDivElement>(null);
-
+  
   const orderId = params.id as string;
   const { user } = useAuth();
-  const { canReviewProduct } = useRating();
 
   useEffect(() => {
     if (orderId) {
@@ -141,18 +142,12 @@ export default function OrderDetailsPage() {
     }
   }, [orderId]);
 
-  useEffect(() => {
-    if (order && user && order.orderStatus === 'delivered') {
-      checkReviewEligibility();
-    }
-  }, [order, user]);
-
   const loadOrder = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await ordersApi.getUserOrder(orderId);
+      const response = await checkoutApi.getOrder(orderId);
       
       if (response.success && response.data?.order) {
         setOrder(response.data.order);
@@ -167,31 +162,6 @@ export default function OrderDetailsPage() {
     }
   };
 
-  const checkReviewEligibility = async () => {
-    if (!order || !user) return;
-    
-    try {
-      setCheckingReviewStatus(true);
-      const reviewStatus: { [key: string]: boolean } = {};
-      
-      for (const item of order.items) {
-        try {
-          const canReview = await canReviewProduct(item.productId);
-          reviewStatus[item.productId] = canReview;
-        } catch (error) {
-          console.error(`Error checking review eligibility for product ${item.productId}:`, error);
-          reviewStatus[item.productId] = false;
-        }
-      }
-      
-      setCanReviewItems(reviewStatus);
-    } catch (error) {
-      console.error('Error checking review eligibility:', error);
-    } finally {
-      setCheckingReviewStatus(false);
-    }
-  };
-
   const handleCancelOrder = async () => {
     if (!confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
       return;
@@ -199,7 +169,7 @@ export default function OrderDetailsPage() {
 
     try {
       setCancelling(true);
-      const response = await ordersApi.cancelOrder(orderId, 'Changed my mind');
+      const response = await checkoutApi.cancelOrder(orderId, 'Changed my mind');
       
       if (response.success) {
         await loadOrder();
@@ -215,157 +185,10 @@ export default function OrderDetailsPage() {
 
   const handlePrintInvoice = () => {
     setPrinting(true);
-    const printContent = generatePrintContent();
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Invoice - Order #${order?.orderNumber}</title>
-          <style>
-            @media print {
-              body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
-              .invoice-container { max-width: 800px; margin: 0 auto; }
-              .invoice-header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 20px; }
-              .invoice-header h1 { margin: 0; font-size: 28px; }
-              .invoice-section { margin-bottom: 25px; }
-              .invoice-section h2 { border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 15px; font-size: 18px; }
-              .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-              .items-table th { background: #f5f5f5; border: 1px solid #ddd; padding: 10px; text-align: left; }
-              .items-table td { border: 1px solid #ddd; padding: 10px; }
-              .summary-table { width: 100%; border-collapse: collapse; }
-              .summary-table td { padding: 8px 0; border-bottom: 1px solid #eee; }
-              .total-row { font-weight: bold; border-top: 2px solid #000; }
-              .no-print { display: none !important; }
-              @page { margin: 20mm; }
-            }
-          </style>
-        </head>
-        <body>
-          ${printContent}
-        </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.focus();
-      setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-      }, 250);
-    }
-    setPrinting(false);
-  };
-
-  const generatePrintContent = () => {
-    if (!order) return '';
-    
-    const formatDate = (dateString: string) => {
-      return new Date(dateString).toLocaleDateString('en-IN', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    };
-
-    const getPaymentMethodText = (method: string) => {
-      switch (method) {
-        case 'credit_card': return 'Credit/Debit Card';
-        case 'upi': return 'UPI Payment';
-        case 'cod': return 'Cash on Delivery';
-        default: return method;
-      }
-    };
-
-    return `
-      <div class="invoice-container">
-        <div class="invoice-header">
-          <h1>Order #${order.orderNumber}</h1>
-          <p><strong>Placed on:</strong> ${formatDate(order.createdAt)}</p>
-          <p><strong>Status:</strong> ${order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}</p>
-        </div>
-
-        <div class="invoice-section">
-          <h2>Customer Information</h2>
-          <p><strong>Name:</strong> ${order.shippingAddress.firstName} ${order.shippingAddress.lastName}</p>
-          <p><strong>Email:</strong> ${order.shippingAddress.email}</p>
-          <p><strong>Phone:</strong> ${order.shippingAddress.phone}</p>
-        </div>
-
-        <div class="invoice-section">
-          <h2>Order Items</h2>
-          <table class="items-table">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${order.items.map(item => `
-                <tr>
-                  <td>${item.productName}</td>
-                  <td>${item.quantity}</td>
-                  <td>₹${item.price.toLocaleString()}</td>
-                  <td>₹${(item.quantity * item.price).toLocaleString()}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-
-        ${order.orderNotes ? `
-          <div class="invoice-section">
-            <h2>Order Notes</h2>
-            <p>${order.orderNotes}</p>
-          </div>
-        ` : ''}
-
-        <div class="invoice-section">
-          <h2>Order Summary</h2>
-          <table class="summary-table">
-            <tr>
-              <td>Subtotal (${order.items.length} items)</td>
-              <td>₹${order.subtotal.toLocaleString()}</td>
-            </tr>
-            <tr>
-              <td>Shipping</td>
-              <td>${order.shippingFee === 0 ? 'FREE' : `₹${order.shippingFee.toLocaleString()}`}</td>
-            </tr>
-            <tr>
-              <td>Tax (18% GST)</td>
-              <td>₹${order.tax.toLocaleString()}</td>
-            </tr>
-            <tr class="total-row">
-              <td>Total Amount</td>
-              <td>₹${order.total.toLocaleString()}</td>
-            </tr>
-          </table>
-          <p><em>Inclusive of all taxes</em></p>
-        </div>
-
-        <div class="invoice-section">
-          <h2>Shipping Address</h2>
-          <p>${order.shippingAddress.firstName} ${order.shippingAddress.lastName}</p>
-          <p>${order.shippingAddress.address}</p>
-          ${order.shippingAddress.apartment ? `<p>${order.shippingAddress.apartment}</p>` : ''}
-          <p>${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.zipCode}</p>
-          <p>${order.shippingAddress.country}</p>
-          <p>📞 ${order.shippingAddress.phone}</p>
-          <p>✉️ ${order.shippingAddress.email}</p>
-        </div>
-
-        <div class="invoice-section">
-          <h2>Payment Information</h2>
-          <p><strong>Payment Method:</strong> ${getPaymentMethodText(order.paymentMethod)}</p>
-          <p><strong>Payment Status:</strong> ${order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1)}</p>
-        </div>
-      </div>
-    `;
+    setTimeout(() => {
+      window.print();
+      setPrinting(false);
+    }, 500);
   };
 
   const formatDate = (dateString: string) => {
@@ -380,9 +203,9 @@ export default function OrderDetailsPage() {
 
   const getPaymentMethodText = (method: string) => {
     switch (method) {
-      case 'credit_card': return 'Credit/Debit Card';
-      case 'upi': return 'UPI Payment';
+      case 'razorpay': return 'Online Payment (Razorpay)';
       case 'cod': return 'Cash on Delivery';
+      case 'upi': return 'UPI Payment';
       default: return method;
     }
   };
@@ -397,20 +220,25 @@ export default function OrderDetailsPage() {
     
     const currentStepIndex = ORDER_TIMELINE_STEPS.findIndex(step => step.key === order.orderStatus);
     
-    // If current status is 'pending', show pending state
-    if (order.orderStatus === 'pending') {
-      return {
-        currentStep: -1,
-        progressPercentage: 0,
-        isComplete: false
-      };
-    }
-    
     return {
       currentStep: currentStepIndex,
       progressPercentage: ((currentStepIndex + 1) / ORDER_TIMELINE_STEPS.length) * 100,
       isComplete: order.orderStatus === 'delivered'
     };
+  };
+
+  const canCancelOrder = () => {
+    if (!order) return false;
+    
+    // Only allow cancellation for pending orders with pending payment
+    if (order.orderStatus === 'pending' && order.paymentStatus === 'pending') {
+      const created = new Date(order.createdAt);
+      const now = new Date();
+      const diffTime = now.getTime() - created.getTime();
+      const diffHours = diffTime / (1000 * 60 * 60);
+      return diffHours <= 24; // Within 24 hours
+    }
+    return false;
   };
 
   const timelineProgress = getTimelineProgress();
@@ -512,7 +340,7 @@ export default function OrderDetailsPage() {
                 <span className="sm:hidden">Print</span>
               </button>
               
-              {order.orderStatus === 'pending' && (
+              {canCancelOrder() && (
                 <button
                   onClick={handleCancelOrder}
                   disabled={cancelling}
@@ -530,7 +358,7 @@ export default function OrderDetailsPage() {
             </div>
           </div>
 
-          {/* Order Status Timeline - Desktop */}
+          {/* Order Status Timeline */}
           {order.orderStatus !== 'cancelled' && timelineProgress && (
             <>
               {/* Desktop Timeline */}
@@ -539,7 +367,7 @@ export default function OrderDetailsPage() {
                   {/* Progress Bar */}
                   <div className="absolute top-1/2 left-0 right-0 h-2 bg-gray-200 rounded-full -translate-y-1/2"></div>
                   <div 
-                    className="absolute top-1/2 left-0 h-2 bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 rounded-full -translate-y-1/2 transition-all duration-500 ease-out"
+                    className="absolute top-1/2 left-0 h-2 bg-gradient-to-r from-yellow-500 via-blue-500 to-green-500 rounded-full -translate-y-1/2 transition-all duration-500 ease-out"
                     style={{ width: `${timelineProgress.progressPercentage}%` }}
                   ></div>
                   
@@ -581,9 +409,9 @@ export default function OrderDetailsPage() {
                           {index < ORDER_TIMELINE_STEPS.length - 1 && (
                             <div className="absolute left-full top-6 -translate-x-1/2 w-full">
                               <div className="flex items-center">
-                                <div className={`flex-1 h-0.5 ${isActive ? 'bg-gradient-to-r from-purple-500 to-indigo-500' : 'bg-gray-300'}`}></div>
+                                <div className={`flex-1 h-0.5 ${isActive ? 'bg-gradient-to-r from-blue-500 to-purple-500' : 'bg-gray-300'}`}></div>
                                 <ArrowRight className={`w-5 h-5 ${isActive ? 'text-purple-500' : 'text-gray-300'}`} />
-                                <div className={`flex-1 h-0.5 ${index + 1 <= timelineProgress.currentStep ? 'bg-gradient-to-r from-indigo-500 to-blue-500' : 'bg-gray-300'}`}></div>
+                                <div className={`flex-1 h-0.5 ${index + 1 <= timelineProgress.currentStep ? 'bg-gradient-to-r from-purple-500 to-indigo-500' : 'bg-gray-300'}`}></div>
                               </div>
                             </div>
                           )}
@@ -593,27 +421,46 @@ export default function OrderDetailsPage() {
                   </div>
                 </div>
                 
-                {/* Current Status Highlight */}
-                {timelineProgress.currentStep >= 0 && (
-                  <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-                    <div className="flex items-center justify-center gap-3">
-                      <div className={`p-2 rounded-full ${ORDER_TIMELINE_STEPS[timelineProgress.currentStep].bgColor}`}>
-                        {(() => {
-                          const IconComponent = ORDER_TIMELINE_STEPS[timelineProgress.currentStep].icon;
-                          return <IconComponent className={`w-6 h-6 ${ORDER_TIMELINE_STEPS[timelineProgress.currentStep].color}`} />;
-                        })()}
+                {/* Payment Status */}
+                <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg border border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-full ${
+                        order.paymentStatus === 'paid' ? 'bg-green-100' :
+                        order.paymentStatus === 'pending' ? 'bg-yellow-100' :
+                        'bg-red-100'
+                      }`}>
+                        <CreditCard className={`w-5 h-5 ${
+                          order.paymentStatus === 'paid' ? 'text-green-600' :
+                          order.paymentStatus === 'pending' ? 'text-yellow-600' :
+                          'text-red-600'
+                        }`} />
                       </div>
                       <div>
                         <p className="font-semibold text-gray-900">
-                          Current Status: {ORDER_TIMELINE_STEPS[timelineProgress.currentStep].label}
+                          Payment: {getPaymentMethodText(order.paymentMethod)}
                         </p>
-                        <p className="text-sm text-gray-600">
-                          {ORDER_TIMELINE_STEPS[timelineProgress.currentStep].description}
+                        <p className={`text-sm ${
+                          order.paymentStatus === 'paid' ? 'text-green-600' :
+                          order.paymentStatus === 'Cod' ? 'text-yellow-600' :
+                          'text-red-600'
+                        }`}>
+                          {order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1)}
                         </p>
                       </div>
                     </div>
+                    
+                    {order.orderStatus === 'pending' && order.paymentStatus === 'pending' && (
+                      <Link
+                        href={`/user/payment?orderId=${order._id}&orderNumber=${order.orderNumber}&amount=${order.total}`}
+                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm flex items-center"
+                      >
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        Complete Payment
+                      </Link>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
 
               {/* Mobile Timeline */}
@@ -622,7 +469,7 @@ export default function OrderDetailsPage() {
                   {/* Progress Bar */}
                   <div className="absolute left-5 top-0 bottom-0 w-1 bg-gray-200"></div>
                   <div 
-                    className="absolute left-5 top-0 w-1 bg-gradient-to-b from-blue-500 via-purple-500 to-green-500 transition-all duration-500 ease-out"
+                    className="absolute left-5 top-0 w-1 bg-gradient-to-b from-yellow-500 via-blue-500 to-green-500 transition-all duration-500 ease-out"
                     style={{ height: `${timelineProgress.progressPercentage}%` }}
                   ></div>
                   
@@ -706,6 +553,36 @@ export default function OrderDetailsPage() {
                     })}
                   </div>
                 </div>
+                
+                {/* Payment Status Mobile */}
+                <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg border border-gray-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="w-4 h-4 text-purple-600" />
+                      <span className="font-medium text-gray-900">Payment</span>
+                    </div>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      order.paymentStatus === 'paid' ? 'bg-green-100 text-green-800' :
+                      order.paymentStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1)}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {getPaymentMethodText(order.paymentMethod)}
+                  </p>
+                  
+                  {order.orderStatus === 'pending' && order.paymentStatus === 'pending' && (
+                    <Link
+                      href={`/user/payment?orderId=${order._id}&orderNumber=${order.orderNumber}&amount=${order.total}`}
+                      className="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm flex items-center justify-center"
+                    >
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Complete Payment
+                    </Link>
+                  )}
+                </div>
               </div>
             </>
           )}
@@ -725,72 +602,10 @@ export default function OrderDetailsPage() {
               </div>
             </div>
           )}
-
-          {/* Pending Order Message */}
-          {order.orderStatus === 'pending' && (
-            <div className="mt-6 p-4 md:p-6 bg-yellow-50 rounded-lg border border-yellow-200">
-              <div className="flex items-center gap-3">
-                <Clock className="w-6 h-6 md:w-8 md:h-8 text-yellow-600 flex-shrink-0" />
-                <div>
-                  <h3 className="font-bold text-yellow-900 text-sm md:text-base">Awaiting Confirmation</h3>
-                  <p className="text-yellow-700 text-xs md:text-sm mt-1">
-                    Your order is pending confirmation. We'll update you once it's confirmed and ready for processing.
-                    {order.paymentMethod === 'cod' && ' For Cash on Delivery orders, confirmation may take up to 24 hours.'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Mobile Customer Profile */}
-          <div className="md:hidden bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200 p-4 mt-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-lg font-bold">
-                  {order.shippingAddress.firstName?.[0]?.toUpperCase()}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h2 className="font-bold text-gray-900 truncate">
-                  {order.shippingAddress.firstName} {order.shippingAddress.lastName}
-                </h2>
-                <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-600">
-                  <Mail className="w-3 h-3" />
-                  <span className="truncate">{order.shippingAddress.email}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Desktop Customer Profile */}
-        <div className="hidden md:block bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-6 mb-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-white text-2xl font-bold">
-                {order.shippingAddress.firstName?.[0]?.toUpperCase()}
-              </span>
-            </div>
-            <div className="flex-1">
-              <h2 className="text-xl font-bold text-gray-900">
-                {order.shippingAddress.firstName} {order.shippingAddress.lastName}
-              </h2>
-              <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                <span className="flex items-center gap-1">
-                  <Mail className="w-4 h-4" />
-                  {order.shippingAddress.email}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Phone className="w-4 h-4" />
-                  {order.shippingAddress.phone}
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className="flex flex-col lg:grid lg:grid-cols-3 gap-5 md:gap-6 lg:gap-8">
-          {/* Left Column - Order Items & Timeline */}
+          {/* Left Column - Order Items */}
           <div className="lg:col-span-2 space-y-5 md:space-y-6">
             {/* Order Items - Mobile Accordion */}
             <div className="md:hidden bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -841,32 +656,6 @@ export default function OrderDetailsPage() {
                               </p>
                             </div>
                           </div>
-                          
-                          {/* Review Button for Delivered Orders */}
-                          {order.orderStatus === 'delivered' && (
-                            <div className="mt-3 pt-3 border-t border-gray-200">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <p className="text-xs text-gray-600">
-                                    {checkingReviewStatus 
-                                      ? 'Checking...' 
-                                      : canReviewItems[item.productId] 
-                                        ? 'Can review' 
-                                        : 'Already reviewed'}
-                                  </p>
-                                </div>
-                                
-                                <button
-                                  onClick={() => router.push(`/products/${item.productId}/reviews`)}
-                                  disabled={checkingReviewStatus || !canReviewItems[item.productId]}
-                                  className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors font-medium text-xs flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  <Star className="w-3 h-3 mr-1.5" />
-                                  Review
-                                </button>
-                              </div>
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -924,32 +713,6 @@ export default function OrderDetailsPage() {
                             </p>
                           </div>
                         </div>
-                        
-                        {/* Review Button for Delivered Orders */}
-                        {order.orderStatus === 'delivered' && (
-                          <div className="mt-4 pt-4 border-t border-gray-200">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className="text-sm text-gray-600">
-                                  {checkingReviewStatus 
-                                    ? 'Checking review eligibility...' 
-                                    : canReviewItems[item.productId] 
-                                      ? 'You can review this product' 
-                                      : 'Already reviewed or not eligible'}
-                                </p>
-                              </div>
-                              
-                              <button
-                                onClick={() => router.push(`/products/${item.productId}/reviews`)}
-                                disabled={checkingReviewStatus || !canReviewItems[item.productId]}
-                                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors font-medium text-sm flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                <Star className="w-4 h-4 mr-2" />
-                                Write Review
-                              </button>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -1063,45 +826,6 @@ export default function OrderDetailsPage() {
               )}
             </div>
 
-            {/* Payment Info - Mobile Accordion */}
-            <div className="md:hidden bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <button
-                onClick={() => toggleSection('payment')}
-                className="w-full p-4 flex items-center justify-between text-left"
-              >
-                <div className="flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-green-600" />
-                  <h2 className="font-bold text-gray-900">Payment Information</h2>
-                </div>
-                {expandedSection === 'payment' ? (
-                  <ChevronUp className="w-4 h-4 text-gray-500" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
-                )}
-              </button>
-              
-              {expandedSection === 'payment' && (
-                <div className="px-4 pb-4 space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 text-sm">Payment Method:</span>
-                    <span className="font-medium text-sm">{getPaymentMethodText(order.paymentMethod)}</span>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 text-sm">Payment Status:</span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      order.paymentStatus === 'paid' ? 'bg-green-100 text-green-800' :
-                      order.paymentStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      order.paymentStatus === 'failed' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1)}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-
             {/* Desktop Right Column */}
             <div className="hidden md:block space-y-6">
               {/* Order Summary */}
@@ -1203,7 +927,8 @@ export default function OrderDetailsPage() {
                 <p className="text-gray-700 mb-4 text-sm">
                   If you have any questions about your order, please contact our customer support.
                 </p>
-                <button className="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium">
+                <button className="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium flex items-center justify-center gap-2">
+                  <ExternalLink className="w-4 h-4" />
                   Contact Support
                 </button>
               </div>
@@ -1215,7 +940,8 @@ export default function OrderDetailsPage() {
               <p className="text-gray-700 mb-3 text-sm">
                 Questions about your order? Contact our customer support.
               </p>
-              <button className="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm">
+              <button className="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm flex items-center justify-center gap-2">
+                <ExternalLink className="w-4 h-4" />
                 Contact Support
               </button>
             </div>

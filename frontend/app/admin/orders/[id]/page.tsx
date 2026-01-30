@@ -121,24 +121,37 @@ export default function AdminOrderDetailsPage() {
     }
   };
 
-  const handleUpdateStatus = async (status: string) => {
-    if (!order) return;
+  // Update the handleUpdateStatus function:
+const handleUpdateStatus = async (status: string) => {
+  if (!order) return;
 
-    try {
-      setUpdating(true);
-      const response = await ordersApi.updateOrderStatus(order._id, status, adminNotes);
-      
-      if (response.success) {
-        await loadOrder();
-      } else {
-        alert(response.error || 'Failed to update status');
+  try {
+    setUpdating(true);
+    
+    // For COD orders, when status is "delivered", also update payment status to "paid"
+    if (status === 'delivered' && order.paymentMethod === 'cod' && order.paymentStatus === 'pending') {
+      // First update payment status
+      const paymentResponse = await ordersApi.updatePaymentStatus(order._id, 'paid');
+      if (!paymentResponse.success) {
+        alert('Failed to update payment status');
+        return;
       }
-    } catch (error: any) {
-      alert(error.message || 'Failed to update status');
-    } finally {
-      setUpdating(false);
     }
-  };
+
+    // Update order status
+    const response = await ordersApi.updateOrderStatus(order._id, status, adminNotes);
+    
+    if (response.success) {
+      await loadOrder();
+    } else {
+      alert(response.error || 'Failed to update status');
+    }
+  } catch (error: any) {
+    alert(error.message || 'Failed to update status');
+  } finally {
+    setUpdating(false);
+  }
+};
 
   const handleSaveAdminNotes = async () => {
     if (!order) return;
