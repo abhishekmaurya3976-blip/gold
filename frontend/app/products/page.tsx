@@ -325,7 +325,7 @@ function ProductsContent() {
                     <span className="text-purple-600 font-bold text-sm uppercase tracking-wider">Premium</span>
                   </div>
                   <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">
-                    All <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">Products</span>
+                    All <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">Collections</span>
                   </h1>
                 </div>
                 <p className="text-gray-600 text-sm md:text-base mt-1 hidden md:block">

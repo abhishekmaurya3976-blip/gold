@@ -176,7 +176,7 @@ export default function Header() {
                   <div className={`relative transition-all duration-300 ${isSearchFocused ? 'shadow-xl scale-[1.01]' : 'shadow-lg'}`}>
                     <input
                       type="text"
-                      placeholder="Search diamond rings, gold necklaces, earrings, bracelets..."
+                      placeholder="Search bracelets, necklaces, earrings, Kada, Rudraksha ..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onFocus={() => setIsSearchFocused(true)}
@@ -383,18 +383,18 @@ export default function Header() {
           </div>
 
           {/* Notice Bar at Bottom */}
-          <div className="border-t border-yellow-100 bg-gradient-to-r from-yellow-50 to-amber-50 py-2">
-            <div className="w-full px-10 xl:px-16 2xl:px-20">
-              <div className="flex items-center justify-center">
-                <div className="flex items-center text-yellow-800 text-sm font-medium">
-                  <AlertCircle className="w-4 h-4 mr-3 text-yellow-600" />
-                  <span className="text-center">
-                    Product rates are subject to change based on prevailing market conditions.
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+         <div className="border-t border-yellow-100 bg-gradient-to-r from-yellow-50 to-amber-50 py-2">
+  <div className="w-full px-10 xl:px-16 2xl:px-20">
+    <div className="flex items-center justify-center">
+      <div className="flex items-center text-yellow-900 text-sl font-bold italic">
+        <AlertCircle className="w-4 h-6 mr-3 text-yellow-00" />
+        <span className="text-center">
+          Product rates are subject to change based on prevailing market conditions.
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
         </div>
 
         {/* Mobile Layout */}
@@ -487,7 +487,7 @@ export default function Header() {
             <form onSubmit={handleSearch} className="relative">
               <input
                 type="text"
-                placeholder="Search gold jewelry, diamonds, rings..."
+                placeholder="Search bracelets, necklaces, earrings, Kada, Rudraksha..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}
@@ -506,13 +506,13 @@ export default function Header() {
 
           {/* Notice Bar for Mobile */}
           <div className="border-t border-yellow-100 bg-gradient-to-r from-yellow-50 to-amber-50 py-2 px-4">
-            <div className="flex items-center justify-center">
-              <div className="flex items-center text-yellow-800 text-xs font-medium text-center">
-                <AlertCircle className="w-3 h-3 mr-1 text-yellow-600 flex-shrink-0" />
-                <span>Product rates are subject to change based on prevailing market conditions.</span>
-              </div>
-            </div>
-          </div>
+      <div className="flex items-center justify-center">
+       <div className="flex items-center text-yellow-800 text-xs font-bold italic text-center">
+      <AlertCircle className="w-3 h-3 mr-2 text-yellow-600 flex-shrink-0" />
+      <span>Product rates are subject to change based on prevailing market conditions.</span>
+      </div>
+    </div>
+</div>
 
           {/* Mobile Navigation Menu */}
           {isMobileMenuOpen && (
