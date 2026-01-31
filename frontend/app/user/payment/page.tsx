@@ -170,7 +170,7 @@ function PaymentPageContent() {
 
   if (paymentStatus === 'success') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 pt-16 md:pt-24">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 pt-16 md:pt-10">
         <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
         
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
