@@ -26,7 +26,7 @@ connectDB();
 
 // ✅ FIXED CORS Configuration
 const allowedOrigins = [
-  'https://silvershringar.netlify.app/',  // Add this
+  'www.silvershringar.com/',  // Add this
   'https://localhost:3000',
   // Optional: add more if needed
   process.env.FRONTEND_URL 
