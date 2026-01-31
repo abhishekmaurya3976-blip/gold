@@ -853,7 +853,7 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                     
-                    <label className="flex items-center p-3 md:p-4 border border-gray-300 rounded-lg md:rounded-xl cursor-pointer hover:bg-gray-50">
+                    {/* <label className="flex items-center p-3 md:p-4 border border-gray-300 rounded-lg md:rounded-xl cursor-pointer hover:bg-gray-50">
                       <input
                         type="radio"
                         name="paymentMethod"
@@ -871,7 +871,7 @@ export default function CheckoutPage() {
                           Pay when you receive your order
                         </p>
                       </div>
-                    </label>
+                    </label> */}
                   </div>
 
                   {formErrors.paymentMethod && (
