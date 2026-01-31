@@ -36,17 +36,13 @@ export default function Footer() {
       { name: 'Contact Us', href: '/contact' },
       { name: 'Shipping Policy', href: '/policy/shipping' },
       { name: 'Return & Exchange', href: '/policy/returns' },
-      { name: 'Size Guide', href: '/guide/size' },
-      { name: 'Jewelry Care', href: '/guide/care' },
-      { name: 'FAQs', href: '/faq' },
     ],
     company: [
       { name: 'About Us', href: '/about' },
       { name: 'Our Story', href: '/about#story' },
       { name: 'Hallmarking', href: '/about#hallmark' },
       { name: 'Privacy Policy', href: '/policy/privacy' },
-      { name: 'Terms of Service', href: '/policy/terms' },
-      { name: 'Store Locator', href: '/stores' },
+      { name: 'Terms of Service', href: '/policy/shipping' },
     ],
   };
 

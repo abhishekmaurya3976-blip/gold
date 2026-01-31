@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const category = await categoryApi.getBySlug(slug);
   
   return {
-    title: `${category?.name || 'Premium Collection'} |Art Plazaaa a a `,
+    title: `${category?.name || 'Premium Collection'} | Art Plazaaa`,
     description: category?.description || `Explore premium ${category?.name || 'art supplies'} collection`,
   };
 }
@@ -80,13 +80,43 @@ async function ProductsContent({
   searchQuery: string;
   slug: string;
 }) {
+  // Fix sorting logic
+  let apiSortBy = 'createdAt';
+  let apiSortOrder: 'asc' | 'desc' = 'desc';
+  
+  switch (sortBy) {
+    case 'createdAt':
+      apiSortBy = 'createdAt';
+      apiSortOrder = 'desc'; // Newest first = descending
+      break;
+    case 'price':
+      apiSortBy = 'price';
+      apiSortOrder = 'asc';
+      break;
+    case 'price-desc':
+      apiSortBy = 'price';
+      apiSortOrder = 'desc';
+      break;
+    case 'name':
+      apiSortBy = 'name';
+      apiSortOrder = 'asc';
+      break;
+    case 'name-desc':
+      apiSortBy = 'name';
+      apiSortOrder = 'desc';
+      break;
+    default:
+      apiSortBy = 'createdAt';
+      apiSortOrder = 'desc';
+  }
+
   const productsData = await productApi.getProducts({
     page,
     limit: 12,
     categoryId,
     isActive: true,
-    sortBy: sortBy === 'price-desc' ? 'price' : sortBy,
-    sortOrder: sortBy.includes('desc') ? 'desc' : 'asc',
+    sortBy: apiSortBy,
+    sortOrder: apiSortOrder,
     search: searchQuery,
   }).catch(() => ({ products: [], total: 0, totalPages: 0 }));
 
