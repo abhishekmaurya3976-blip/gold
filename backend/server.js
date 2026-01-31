@@ -26,7 +26,8 @@ connectDB();
 
 // ✅ FIXED CORS Configuration
 const allowedOrigins = [
-  'www.silvershringar.com/',  // Add this
+  'https://silvershringar.com/',
+  'http://silvershringar.com/',// Add this
   'https://localhost:3000',
   // Optional: add more if needed
   process.env.FRONTEND_URL 
