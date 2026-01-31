@@ -25,12 +25,7 @@ export default function Footer() {
 
   const footerLinks = {
     shop: [
-      { name: 'Gold Jewelry', href: '/categories/gold-jewelry' },
-      { name: 'Diamond Rings', href: '/categories/diamond-rings' },
-      { name: 'Silver Collection', href: '/categories/silver-collection' },
-      { name: 'Bridal Collection', href: '/categories/bridal-collection' },
       { name: 'New Arrivals', href: '/products?sort=newest' },
-      { name: 'Best Sellers', href: '/products?isBestSeller=true' },
     ],
     customer: [
       { name: 'Contact Us', href: '/contact' },
@@ -39,8 +34,6 @@ export default function Footer() {
     ],
     company: [
       { name: 'About Us', href: '/about' },
-      { name: 'Our Story', href: '/about#story' },
-      { name: 'Hallmarking', href: '/about#hallmark' },
       { name: 'Privacy Policy', href: '/policy/privacy' },
       { name: 'Terms of Service', href: '/policy/shipping' },
     ],

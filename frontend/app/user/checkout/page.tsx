@@ -1019,7 +1019,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex items-center text-xs text-gray-600">
                       <Shield className="w-3 h-3 mr-2 text-green-600" />
-                      <span>30-day return policy</span>
+                      <span>7-day return policy</span>
                     </div>
                     <div className="flex items-center text-xs text-gray-600">
                       <Package className="w-3 h-3 mr-2 text-purple-600" />
@@ -1103,7 +1103,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
                     <Shield className="w-4 h-4 mr-3 text-green-600" />
-                    <span>30-day return policy</span>
+                    <span>7-day return policy</span>
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
                     <Package className="w-4 h-4 mr-3 text-purple-600" />
