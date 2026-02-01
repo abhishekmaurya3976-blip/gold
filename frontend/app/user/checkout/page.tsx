@@ -81,11 +81,11 @@ export default function CheckoutPage() {
     orderNotes: ''
   });
 
-  // Calculate total with tax
+  // Calculate total WITHOUT tax - Updated to remove tax calculation
   const calculateTotals = () => {
     const subtotal = totalPrice;
-    const shippingFee = subtotal > 499 ? 0 : 50;
-    const tax = subtotal * 0.18;
+    const shippingFee = subtotal >= 1999 ? 0 : 50; // Free shipping over ₹1999
+    const tax = 0; // Tax is 0, backend will calculate if needed
     const total = subtotal + shippingFee + tax;
     
     return { subtotal, shippingFee, tax, total };
@@ -114,7 +114,7 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen bg-white pt-16 md:pt-24 flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="w-12 h-12 text-purple-600 animate-spin mx-auto mb-4" />
+          <RefreshCw className="w-12 h-12 text-yellow-600 animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Checking authentication...</p>
         </div>
       </div>
@@ -126,7 +126,7 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen bg-white pt-16 md:pt-24 flex items-center justify-center">
         <div className="text-center">
-          <Lock className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+          <Lock className="w-12 h-12 text-yellow-600 mx-auto mb-4" />
           <p className="text-gray-600">Redirecting to login...</p>
         </div>
       </div>
@@ -290,14 +290,14 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen bg-white pt-16 md:pt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 lg:py-20 text-center">
-          <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
-            <AlertCircle className="w-10 h-10 md:w-12 md:h-12 text-amber-600" />
+          <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-r from-yellow-100 to-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+            <AlertCircle className="w-10 h-10 md:w-12 md:h-12 text-yellow-600" />
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 md:mb-4">Your cart is empty</h1>
           <p className="text-gray-600 mb-6 md:mb-8 text-sm md:text-base">Add some products to your cart before checkout</p>
           <Link
             href="/products"
-            className="inline-flex items-center justify-center px-5 py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-medium text-sm md:text-base"
+            className="inline-flex items-center justify-center px-5 py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-lg hover:from-yellow-600 hover:to-amber-600 transition-all duration-300 font-medium text-sm md:text-base"
           >
             <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 mr-2" />
             Continue Shopping
@@ -316,16 +316,16 @@ export default function CheckoutPage() {
         <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4">
             <nav className="flex items-center text-xs md:text-sm text-gray-600 overflow-x-auto whitespace-nowrap">
-              <Link href="/" className="hover:text-purple-600 transition-colors flex items-center">
+              <Link href="/" className="hover:text-yellow-600 transition-colors flex items-center">
                 <Crown className="w-3 h-3 mr-1 md:mr-2" />
                 Home
               </Link>
               <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 text-gray-400 flex-shrink-0" />
-              <Link href="/products" className="hover:text-purple-600 transition-colors">
+              <Link href="/products" className="hover:text-yellow-600 transition-colors">
                 Products
               </Link>
               <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 text-gray-400 flex-shrink-0" />
-              <Link href="/user/cart" className="hover:text-purple-600 transition-colors">
+              <Link href="/user/cart" className="hover:text-yellow-600 transition-colors">
                 Cart
               </Link>
               <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1 md:mx-2 text-gray-400 flex-shrink-0" />
@@ -369,7 +369,7 @@ export default function CheckoutPage() {
               {!isCOD && (
                 <Link
                   href={`/user/payment?orderId=${orderId}&orderNumber=${orderNumber}&amount=${totals.total}`}
-                  className="inline-flex items-center justify-center px-5 py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-medium text-sm md:text-base shadow-lg hover:shadow-xl"
+                  className="inline-flex items-center justify-center px-5 py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-lg hover:from-yellow-600 hover:to-amber-600 transition-all duration-300 font-medium text-sm md:text-base shadow-lg hover:shadow-xl"
                 >
                   <CreditCard className="w-4 h-4 md:w-5 md:h-5 mr-2" />
                   Complete Payment
@@ -403,16 +403,16 @@ export default function CheckoutPage() {
       <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 hidden sm:block">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4">
           <nav className="flex items-center text-sm text-gray-600">
-            <Link href="/" className="hover:text-purple-600 transition-colors flex items-center">
+            <Link href="/" className="hover:text-yellow-600 transition-colors flex items-center">
               <Crown className="w-3 h-3 mr-2" />
               Home
             </Link>
             <ChevronRight className="w-4 h-4 mx-2 text-gray-400" />
-            <Link href="/products" className="hover:text-purple-600 transition-colors">
+            <Link href="/products" className="hover:text-yellow-600 transition-colors">
               Products
             </Link>
             <ChevronRight className="w-4 h-4 mx-2 text-gray-400" />
-            <Link href="/user/cart" className="hover:text-purple-600 transition-colors">
+            <Link href="/user/cart" className="hover:text-yellow-600 transition-colors">
               Cart
             </Link>
             <ChevronRight className="w-4 h-4 mx-2 text-gray-400" />
@@ -444,10 +444,10 @@ export default function CheckoutPage() {
           <div className="flex items-center justify-between max-w-2xl mx-auto">
             {['Delivery', 'Review', 'Payment'].map((label, index) => (
               <div key={label} className="flex items-center">
-                <div className={`flex flex-col items-center ${index + 1 <= step ? 'text-purple-600' : 'text-gray-400'}`}>
+                <div className={`flex flex-col items-center ${index + 1 <= step ? 'text-yellow-600' : 'text-gray-400'}`}>
                   <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center mb-1 md:mb-2 ${
                     index + 1 <= step 
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white' 
+                      ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white' 
                       : 'bg-gray-200'
                   }`}>
                     {index + 1 <= step ? (
@@ -461,7 +461,7 @@ export default function CheckoutPage() {
                 </div>
                 {index < 2 && (
                   <div className={`w-8 md:w-16 lg:w-20 h-1 mx-1 md:mx-2 lg:mx-4 ${
-                    index + 1 < step ? 'bg-gradient-to-r from-purple-600 to-pink-600' : 'bg-gray-200'
+                    index + 1 < step ? 'bg-gradient-to-r from-yellow-500 to-amber-500' : 'bg-gray-200'
                   }`} />
                 )}
               </div>
@@ -470,9 +470,9 @@ export default function CheckoutPage() {
         </div>
 
         {/* Welcome Message */}
-        <div className="mb-4 md:mb-6 bg-gradient-to-r from-purple-50 to-pink-50 p-3 md:p-4 rounded-lg md:rounded-xl border border-purple-200 mx-2 sm:mx-0">
+        <div className="mb-4 md:mb-6 bg-gradient-to-r from-yellow-50 to-amber-50 p-3 md:p-4 rounded-lg md:rounded-xl border border-yellow-200 mx-2 sm:mx-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-yellow-500 to-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
               <span className="text-white font-bold text-sm md:text-lg">{user.name?.[0]?.toUpperCase() || 'U'}</span>
             </div>
             <div className="min-w-0">
@@ -489,7 +489,7 @@ export default function CheckoutPage() {
             className="w-full flex items-center justify-between p-3 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <div className="flex items-center">
-              <Package className="w-5 h-5 text-purple-600 mr-2" />
+              <Package className="w-5 h-5 text-yellow-600 mr-2" />
               <span className="font-medium text-gray-900">Order Summary</span>
               <span className="ml-2 text-sm text-gray-500">({cart.length} items)</span>
             </div>
@@ -509,7 +509,7 @@ export default function CheckoutPage() {
               {step === 1 && (
                 <div className="bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-200 p-4 md:p-6">
                   <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 md:mb-6 flex items-center">
-                    <MapPin className="w-5 h-5 md:w-6 md:h-6 mr-2 text-purple-600" />
+                    <MapPin className="w-5 h-5 md:w-6 md:h-6 mr-2 text-yellow-600" />
                     Shipping Address
                   </h2>
                   
@@ -527,7 +527,7 @@ export default function CheckoutPage() {
                           value={formData.firstName}
                           onChange={handleChange}
                           required
-                          className={`w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm md:text-base ${
+                          className={`w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm md:text-base ${
                             formErrors.firstName ? 'border-red-500' : 'border-gray-300'
                           }`}
                           placeholder="Enter your first name"
@@ -549,7 +549,7 @@ export default function CheckoutPage() {
                         value={formData.lastName}
                         onChange={handleChange}
                         required
-                        className={`w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm md:text-base ${
+                        className={`w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm md:text-base ${
                           formErrors.lastName ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="Enter your last name"
@@ -572,7 +572,7 @@ export default function CheckoutPage() {
                           value={formData.email}
                           onChange={handleChange}
                           required
-                          className={`w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm md:text-base ${
+                          className={`w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm md:text-base ${
                             formErrors.email ? 'border-red-500' : 'border-gray-300'
                           }`}
                           placeholder="Enter your email address"
@@ -596,7 +596,7 @@ export default function CheckoutPage() {
                           value={formData.phone}
                           onChange={handleChange}
                           required
-                          className={`w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm md:text-base ${
+                          className={`w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm md:text-base ${
                             formErrors.phone ? 'border-red-500' : 'border-gray-300'
                           }`}
                           placeholder="Enter 10-digit phone number"
@@ -619,7 +619,7 @@ export default function CheckoutPage() {
                         value={formData.address}
                         onChange={handleChange}
                         required
-                        className={`w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm md:text-base ${
+                        className={`w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm md:text-base ${
                           formErrors.address ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="Enter street address, house number"
@@ -638,7 +638,7 @@ export default function CheckoutPage() {
                         name="apartment"
                         value={formData.apartment}
                         onChange={handleChange}
-                        className="w-full px-3 md:px-4 py-2.5 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm md:text-base"
+                        className="w-full px-3 md:px-4 py-2.5 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm md:text-base"
                         placeholder="Apt, suite, building (optional)"
                       />
                     </div>
@@ -654,7 +654,7 @@ export default function CheckoutPage() {
                         value={formData.city}
                         onChange={handleChange}
                         required
-                        className={`w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm md:text-base ${
+                        className={`w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm md:text-base ${
                           formErrors.city ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="Enter city name"
@@ -675,7 +675,7 @@ export default function CheckoutPage() {
                         value={formData.state}
                         onChange={handleChange}
                         required
-                        className={`w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm md:text-base ${
+                        className={`w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm md:text-base ${
                           formErrors.state ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="Enter state"
@@ -696,7 +696,7 @@ export default function CheckoutPage() {
                         value={formData.zipCode}
                         onChange={handleChange}
                         required
-                        className={`w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm md:text-base ${
+                        className={`w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm md:text-base ${
                           formErrors.zipCode ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="Enter 6-digit PIN code"
@@ -714,7 +714,7 @@ export default function CheckoutPage() {
                       name="saveAddress"
                       checked={formData.saveAddress}
                       onChange={handleChange}
-                      className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                      className="w-4 h-4 text-yellow-600 rounded focus:ring-yellow-500"
                     />
                     <span className="ml-2 text-sm text-gray-700">Save this address for future orders</span>
                   </label>
@@ -725,7 +725,7 @@ export default function CheckoutPage() {
               {step === 2 && (
                 <div className="bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-200 p-4 md:p-6">
                   <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 md:mb-6 flex items-center">
-                    <Package className="w-5 h-5 md:w-6 md:h-6 mr-2 text-purple-600" />
+                    <Package className="w-5 h-5 md:w-6 md:h-6 mr-2 text-yellow-600" />
                     Review Your Order
                   </h2>
                   
@@ -785,7 +785,7 @@ export default function CheckoutPage() {
                       value={formData.orderNotes}
                       onChange={handleChange}
                       rows={3}
-                      className="w-full px-3 md:px-4 py-2.5 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm md:text-base"
+                      className="w-full px-3 md:px-4 py-2.5 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm md:text-base"
                       placeholder="Special instructions, delivery preferences, gift wrapping requests, etc."
                     />
                   </div>
@@ -795,7 +795,7 @@ export default function CheckoutPage() {
                     <button
                       type="button"
                       onClick={() => setStep(1)}
-                      className="text-purple-600 hover:text-purple-800 text-sm font-medium flex items-center"
+                      className="text-yellow-600 hover:text-yellow-800 text-sm font-medium flex items-center"
                     >
                       <ArrowLeft className="w-4 h-4 mr-1" />
                       Edit Shipping Address
@@ -808,23 +808,23 @@ export default function CheckoutPage() {
               {step === 3 && (
                 <div className="bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-200 p-4 md:p-6">
                   <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 md:mb-6 flex items-center">
-                    <CreditCard className="w-5 h-5 md:w-6 md:h-6 mr-2 text-purple-600" />
+                    <CreditCard className="w-5 h-5 md:w-6 md:h-6 mr-2 text-yellow-600" />
                     Select Payment Method
                   </h2>
                   
                   <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
-                    <label className="flex items-center p-3 md:p-4 border-2 border-purple-500 rounded-lg md:rounded-xl cursor-pointer bg-gradient-to-r from-purple-50 to-pink-50">
+                    <label className="flex items-center p-3 md:p-4 border-2 border-yellow-500 rounded-lg md:rounded-xl cursor-pointer bg-gradient-to-r from-yellow-50 to-amber-50">
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="razorpay"
                         checked={formData.paymentMethod === 'razorpay'}
                         onChange={handleChange}
-                        className="w-4 h-4 md:w-5 md:h-5 text-purple-600"
+                        className="w-4 h-4 md:w-5 md:h-5 text-yellow-600"
                       />
                       <div className="ml-3 md:ml-4">
                         <div className="flex items-center">
-                          <CreditCard className="w-4 h-4 md:w-5 md:h-5 text-purple-600 mr-2" />
+                          <CreditCard className="w-4 h-4 md:w-5 md:h-5 text-yellow-600 mr-2" />
                           <span className="font-bold text-gray-900 text-sm md:text-base">Razorpay</span>
                         </div>
                         <p className="text-xs md:text-sm text-gray-600 mt-0.5 md:mt-1">
@@ -860,7 +860,7 @@ export default function CheckoutPage() {
                         value="cod"
                         checked={formData.paymentMethod === 'cod'}
                         onChange={handleChange}
-                        className="w-4 h-4 md:w-5 md:h-5 text-purple-600"
+                        className="w-4 h-4 md:w-5 md:h-5 text-yellow-600"
                       />
                       <div className="ml-3 md:ml-4">
                         <div className="flex items-center">
@@ -893,7 +893,7 @@ export default function CheckoutPage() {
                     <button
                       type="button"
                       onClick={() => setStep(2)}
-                      className="text-purple-600 hover:text-purple-800 text-sm font-medium flex items-center"
+                      className="text-yellow-600 hover:text-yellow-800 text-sm font-medium flex items-center"
                     >
                       <ArrowLeft className="w-4 h-4 mr-1" />
                       Edit Order Details
@@ -918,7 +918,7 @@ export default function CheckoutPage() {
                   type="button"
                   onClick={handleNextStep}
                   disabled={loading}
-                  className="w-full sm:w-auto px-5 py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-sm md:text-base"
+                  className="w-full sm:w-auto px-5 py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-lg hover:from-yellow-600 hover:to-amber-600 transition-all duration-300 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-sm md:text-base"
                 >
                   {loading ? (
                     <>
@@ -963,23 +963,42 @@ export default function CheckoutPage() {
                     </span>
                   </div>
                   
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 text-sm">Tax (18% GST)</span>
-                    <span className="font-medium text-sm">₹{totals.tax.toFixed(2)}</span>
-                  </div>
+                  {/* Tax line removed - No GST */}
                   
                   <div className="border-t border-gray-200 pt-3">
                     <div className="flex justify-between">
                       <span className="font-bold text-gray-900">Total Amount</span>
                       <div className="text-right">
                         <span className="text-xl font-bold text-gray-900">
-                          ₹{totals.total.toFixed(2)}
+                          ₹{totals.total.toLocaleString()}
                         </span>
-                        <p className="text-xs text-gray-500">Inclusive of all taxes</p>
+                        <p className="text-xs text-gray-500">
+                          {totals.shippingFee === 0 ? 'Free shipping included' : 'Shipping calculated'}
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Shipping Progress Bar */}
+                {totals.subtotal < 1999 && (
+                  <div className="mb-4 p-3 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-lg border border-yellow-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-medium text-yellow-900">
+                        Add ₹{(1999 - totals.subtotal).toLocaleString()} more for FREE shipping
+                      </span>
+                      <span className="text-xs font-bold text-yellow-700">
+                        {Math.round((totals.subtotal / 1999) * 100)}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-yellow-200 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-yellow-500 to-amber-500 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${Math.min(100, (totals.subtotal / 1999) * 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Cart Items Preview */}
                 <div className="mb-4">
@@ -1015,14 +1034,14 @@ export default function CheckoutPage() {
                   <div className="space-y-2">
                     <div className="flex items-center text-xs text-gray-600">
                       <Truck className="w-3 h-3 mr-2 text-blue-600" />
-                      <span>Free shipping on orders over ₹499</span>
+                      <span>Free shipping on orders over ₹1999</span>
                     </div>
                     <div className="flex items-center text-xs text-gray-600">
                       <Shield className="w-3 h-3 mr-2 text-green-600" />
                       <span>7-day return policy</span>
                     </div>
                     <div className="flex items-center text-xs text-gray-600">
-                      <Package className="w-3 h-3 mr-2 text-purple-600" />
+                      <Package className="w-3 h-3 mr-2 text-yellow-600" />
                       <span>Delivery in 3-5 business days</span>
                     </div>
                   </div>
@@ -1047,23 +1066,42 @@ export default function CheckoutPage() {
                   </span>
                 </div>
                 
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Tax (18% GST)</span>
-                  <span className="font-medium">₹{totals.tax.toFixed(2)}</span>
-                </div>
+                {/* Tax line removed - No GST */}
                 
                 <div className="border-t border-gray-200 pt-4">
                   <div className="flex justify-between">
                     <span className="text-lg font-bold text-gray-900">Total Amount</span>
                     <div className="text-right">
                       <span className="text-2xl font-bold text-gray-900">
-                        ₹{totals.total.toFixed(2)}
+                        ₹{totals.total.toLocaleString()}
                       </span>
-                      <p className="text-xs text-gray-500">Inclusive of all taxes</p>
+                      <p className="text-xs text-gray-500">
+                        {totals.shippingFee === 0 ? 'Free shipping included' : 'Shipping calculated'}
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
+
+              {/* Shipping Progress Bar */}
+              {totals.subtotal < 1999 && (
+                <div className="mb-6 p-3 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-lg border border-yellow-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-yellow-900">
+                      Add ₹{(1999 - totals.subtotal).toLocaleString()} more for FREE shipping
+                    </span>
+                    <span className="text-sm font-bold text-yellow-700">
+                      {Math.round((totals.subtotal / 1999) * 100)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-yellow-200 rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-yellow-500 to-amber-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min(100, (totals.subtotal / 1999) * 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
 
               {/* Cart Items Preview */}
               <div className="mb-6">
@@ -1099,14 +1137,14 @@ export default function CheckoutPage() {
                 <div className="space-y-3">
                   <div className="flex items-center text-sm text-gray-600">
                     <Truck className="w-4 h-4 mr-3 text-blue-600" />
-                    <span>Free shipping on orders over ₹499</span>
+                    <span>Free shipping on orders over ₹1999</span>
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
                     <Shield className="w-4 h-4 mr-3 text-green-600" />
                     <span>7-day return policy</span>
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
-                    <Package className="w-4 h-4 mr-3 text-purple-600" />
+                    <Package className="w-4 h-4 mr-3 text-yellow-600" />
                     <span>Delivery in 3-5 business days</span>
                   </div>
                 </div>

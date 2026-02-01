@@ -281,7 +281,7 @@ export default function OrderDetailsPage() {
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --brand: #6D28D9; /* purple-600 */
+    --brand: #D97706; /* amber-600 */
     --muted: #6B7280;
     --bg: #fff;
   }
@@ -327,7 +327,7 @@ export default function OrderDetailsPage() {
   <div class="page" id="invoice">
     <header>
       <div class="brand">
-        <div style="width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#7C3AED,#EC4899);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">SS</div>
+        <div style="width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#D97706,#F59E0B);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">SS</div>
         <div>
           <div class="title">Silver Shringar</div>
           <div class="small">Invoice for Order</div>
@@ -393,9 +393,8 @@ export default function OrderDetailsPage() {
         <div class="box">
           <div style="display:flex;justify-content:space-between"><div class="small">Subtotal</div><div>₹${formatNumber(o.subtotal)}</div></div>
           <div style="display:flex;justify-content:space-between;margin-top:6px;"><div class="small">Shipping</div><div>${o.shippingFee === 0 ? 'FREE' : '₹' + formatNumber(o.shippingFee)}</div></div>
-          <div style="display:flex;justify-content:space-between;margin-top:6px;"><div class="small">Tax (18% GST)</div><div>₹${formatNumber(o.tax)}</div></div>
           <hr style="border:none;border-top:1px dashed #E6EEF8;margin:10px 0;">
-          <div style="display:flex;justify-content:space-between;font-weight:700;font-size:16px;"><div>Total</div><div>₹${formatNumber(o.total)}</div></div>
+          <div style="display:flex;justify-content:space-between;font-weight:700;font-size:16px;"><div>Total</div><div>₹${formatNumber(o.subtotal + o.shippingFee)}</div></div>
         </div>
       </div>
 
@@ -452,14 +451,14 @@ export default function OrderDetailsPage() {
     }
   };
 
-  // ------------------ Render UI (unchanged layout + timeline + details) ------------------
+  // ------------------ Render UI ------------------
 
   if (loading) {
     return (
       <div className="min-h-screen bg-white pt-20 md:pt-24">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 md:py-12">
           <div className="text-center">
-            <RefreshCw className="w-10 h-10 md:w-12 md:h-12 text-purple-600 animate-spin mx-auto mb-3 md:mb-4" />
+            <RefreshCw className="w-10 h-10 md:w-12 md:h-12 text-yellow-600 animate-spin mx-auto mb-3 md:mb-4" />
             <p className="text-gray-600 text-sm md:text-base">Loading order details...</p>
           </div>
         </div>
@@ -477,7 +476,7 @@ export default function OrderDetailsPage() {
             <p className="text-gray-600 text-sm md:text-base mb-4 md:mb-6">{error || 'The order you are looking for does not exist.'}</p>
             <Link
               href="/user/orders"
-              className="inline-flex items-center px-4 py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors font-medium text-sm md:text-base"
+              className="inline-flex items-center px-4 py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-lg hover:from-yellow-600 hover:to-amber-600 transition-colors font-medium text-sm md:text-base"
             >
               <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 mr-1.5 md:mr-2" />
               Back to Orders
@@ -488,17 +487,20 @@ export default function OrderDetailsPage() {
     );
   }
 
+  // Calculate total without tax
+  const actualTotal = order.subtotal + order.shippingFee;
+
   return (
     <div className="min-h-screen bg-white pt-3 md:pt-2">
       {/* Breadcrumb */}
       <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-2 md:py-4">
           <nav className="flex items-center text-xs md:text-sm text-gray-600">
-            <Link href="/" className="hover:text-purple-600 transition-colors">
+            <Link href="/" className="hover:text-yellow-600 transition-colors">
               Home
             </Link>
             <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1.5 md:mx-2 text-gray-400" />
-            <Link href="/user/orders" className="hover:text-purple-600 transition-colors">
+            <Link href="/user/orders" className="hover:text-yellow-600 transition-colors">
               My Orders
             </Link>
             <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1.5 md:mx-2 text-gray-400" />
@@ -663,8 +665,8 @@ export default function OrderDetailsPage() {
 
                     {order.orderStatus === 'pending' && order.paymentStatus === 'pending' && (
                       <Link
-                        href={`/user/payment?orderId=${order._id}&orderNumber=${order.orderNumber}&amount=${order.total}`}
-                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm flex items-center"
+                        href={`/user/payment?orderId=${order._id}&orderNumber=${order.orderNumber}&amount=${actualTotal}`}
+                        className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors font-medium text-sm flex items-center"
                       >
                         <CreditCard className="w-4 h-4 mr-2" />
                         Complete Payment
@@ -769,7 +771,7 @@ export default function OrderDetailsPage() {
                 <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg border border-gray-200">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <CreditCard className="w-4 h-4 text-purple-600" />
+                      <CreditCard className="w-4 h-4 text-yellow-600" />
                       <span className="font-medium text-gray-900">Payment</span>
                     </div>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -786,8 +788,8 @@ export default function OrderDetailsPage() {
 
                   {order.orderStatus === 'pending' && order.paymentStatus === 'pending' && (
                     <Link
-                      href={`/user/payment?orderId=${order._id}&orderNumber=${order.orderNumber}&amount=${order.total}`}
-                      className="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm flex items-center justify-center"
+                      href={`/user/payment?orderId=${order._id}&orderNumber=${order.orderNumber}&amount=${actualTotal}`}
+                      className="w-full py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors font-medium text-sm flex items-center justify-center"
                     >
                       <CreditCard className="w-4 h-4 mr-2" />
                       Complete Payment
@@ -972,19 +974,18 @@ export default function OrderDetailsPage() {
                       <span className="font-medium text-sm">{order.shippingFee === 0 ? 'FREE' : `₹${order.shippingFee.toLocaleString()}`}</span>
                     </div>
 
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 text-sm">Tax (18% GST)</span>
-                      <span className="font-medium text-sm">₹{order.tax.toLocaleString()}</span>
-                    </div>
+                    {/* Tax line removed */}
 
                     <div className="border-t border-gray-200 pt-2.5">
                       <div className="flex justify-between">
                         <span className="font-bold text-gray-900">Total Amount</span>
                         <div className="text-right">
                           <span className="text-lg font-bold text-gray-900">
-                            ₹{order.total.toLocaleString()}
+                            ₹{actualTotal.toLocaleString()}
                           </span>
-                          <p className="text-xs text-gray-500">Inclusive of all taxes</p>
+                          <p className="text-xs text-gray-500">
+                            {order.shippingFee === 0 ? 'Free shipping included' : 'Shipping included'}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -1054,19 +1055,18 @@ export default function OrderDetailsPage() {
                     <span className="font-medium">{order.shippingFee === 0 ? 'FREE' : `₹${order.shippingFee.toLocaleString()}`}</span>
                   </div>
 
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Tax (18% GST)</span>
-                    <span className="font-medium">₹{order.tax.toLocaleString()}</span>
-                  </div>
+                  {/* Tax line removed */}
 
                   <div className="border-t border-gray-200 pt-3">
                     <div className="flex justify-between">
                       <span className="text-lg font-bold text-gray-900">Total Amount</span>
                       <div className="text-right">
                         <span className="text-2xl font-bold text-gray-900">
-                          ₹{order.total.toLocaleString()}
+                          ₹{actualTotal.toLocaleString()}
                         </span>
-                        <p className="text-xs text-gray-500">Inclusive of all taxes</p>
+                        <p className="text-xs text-gray-500">
+                          {order.shippingFee === 0 ? 'Free shipping included' : 'Shipping included'}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1133,12 +1133,12 @@ export default function OrderDetailsPage() {
               </div>
 
               {/* Need Help */}
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-6">
+              <div className="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-xl border border-yellow-200 p-6">
                 <h3 className="font-bold text-gray-900 mb-3">Need Help?</h3>
                 <p className="text-gray-700 mb-4 text-sm">
                   If you have any questions about your order, please contact our customer support.
                 </p>
-                <button className="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium flex items-center justify-center gap-2">
+                <button className="w-full py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors font-medium flex items-center justify-center gap-2">
                   <ExternalLink className="w-4 h-4" />
                   Contact Support
                 </button>
@@ -1146,12 +1146,12 @@ export default function OrderDetailsPage() {
             </div>
 
             {/* Mobile Need Help */}
-            <div className="md:hidden bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200 p-4">
+            <div className="md:hidden bg-gradient-to-r from-yellow-50 to-amber-50 rounded-lg border border-yellow-200 p-4">
               <h3 className="font-bold text-gray-900 mb-2">Need Help?</h3>
               <p className="text-gray-700 mb-3 text-sm">
                 Questions about your order? Contact our customer support.
               </p>
-              <button className="w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm flex items-center justify-center gap-2">
+              <button className="w-full py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors font-medium text-sm flex items-center justify-center gap-2">
                 <ExternalLink className="w-4 h-4" />
                 Contact Support
               </button>

@@ -104,15 +104,15 @@ export default function CartPage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pt-20 pb-8 px-4 flex items-center justify-center">
         <div className="w-full max-w-md text-center">
-          <div className="w-24 h-24 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Lock className="w-12 h-12 text-purple-600" />
+          <div className="w-24 h-24 bg-gradient-to-r from-yellow-100 to-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Lock className="w-12 h-12 text-yellow-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Please Login</h1>
           <p className="text-gray-600 mb-8">You need to be logged in to view your cart.</p>
           <div className="space-y-3">
             <button
               onClick={loginRequired}
-              className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-medium shadow-lg active:scale-95"
+              className="w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-xl hover:from-yellow-600 hover:to-amber-600 transition-all duration-300 font-medium shadow-lg active:scale-95"
             >
               Go to Login
             </button>
@@ -136,14 +136,14 @@ export default function CartPage() {
         <div className="max-w-7xl mx-auto px-4 mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center mr-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-amber-500 rounded-lg flex items-center justify-center mr-3">
                 <ShoppingBag className="w-6 h-6 text-white" />
               </div>
               <h1 className="text-2xl font-bold text-gray-900">Shopping Cart</h1>
             </div>
             <Link
               href="/products"
-              className="md:hidden flex items-center text-sm text-purple-600 font-medium"
+              className="md:hidden flex items-center text-sm text-yellow-600 font-medium"
             >
               <ArrowLeft className="w-4 h-4 mr-1" />
               Shop
@@ -154,8 +154,8 @@ export default function CartPage() {
         {/* Empty Cart Content */}
         <div className="max-w-md mx-auto px-4 py-12">
           <div className="text-center">
-            <div className="mx-auto w-32 h-32 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full flex items-center justify-center mb-6">
-              <ShoppingCart className="w-16 h-16 text-purple-600" />
+            <div className="mx-auto w-32 h-32 bg-gradient-to-r from-yellow-100 to-amber-100 rounded-full flex items-center justify-center mb-6">
+              <ShoppingCart className="w-16 h-16 text-yellow-600" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Your cart is empty</h1>
             <p className="text-gray-600 mb-8">
@@ -164,14 +164,14 @@ export default function CartPage() {
             <div className="space-y-3">
               <Link
                 href="/products"
-                className="inline-flex items-center justify-center w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-medium shadow-lg active:scale-95"
+                className="inline-flex items-center justify-center w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-xl hover:from-yellow-600 hover:to-amber-600 transition-all duration-300 font-medium shadow-lg active:scale-95"
               >
                 <ShoppingBag className="w-5 h-5 mr-2" />
                 Start Shopping
               </Link>
               <Link
                 href="/user/wishlist"
-                className="inline-flex items-center justify-center w-full px-6 py-3 border border-purple-600 text-purple-600 rounded-xl hover:bg-purple-50 transition-all duration-300 font-medium"
+                className="inline-flex items-center justify-center w-full px-6 py-3 border border-yellow-500 text-yellow-600 rounded-xl hover:bg-yellow-50 transition-all duration-300 font-medium"
               >
                 <Heart className="w-5 h-5 mr-2" />
                 View Wishlist
@@ -183,14 +183,14 @@ export default function CartPage() {
           <div className="mt-12">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Popular Categories</h3>
             <div className="grid grid-cols-2 gap-3">
-              {['Oil Paints', 'Brushes', 'Canvases', 'Sketching'].map((category, idx) => (
-                <Link
+              {['Bracelets', 'Necklace', 'Kada', 'Pendant'].map((category, idx) => (
+                <Link  
                   key={idx}
                   href={`/products?category=${category.toLowerCase().replace(' ', '-')}`}
-                  className="bg-white rounded-xl p-4 border border-gray-200 hover:border-purple-300 hover:shadow-sm transition-all duration-300 active:scale-95"
+                  className="bg-white rounded-xl p-4 border border-gray-200 hover:border-yellow-300 hover:shadow-sm transition-all duration-300 active:scale-95"
                 >
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-2 mx-auto">
-                    <Package className="w-5 h-5 text-purple-600" />
+                  <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mb-2 mx-auto">
+                    <Package className="w-5 h-5 text-yellow-600" />
                   </div>
                   <p className="text-sm font-medium text-gray-900 text-center">{category}</p>
                 </Link>
@@ -229,7 +229,7 @@ export default function CartPage() {
       <div className="hidden md:block max-w-7xl mx-auto px-4 mb-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center mr-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-amber-500 rounded-lg flex items-center justify-center mr-3">
               <ShoppingBag className="w-6 h-6 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900">Shopping Cart ({totalItems} items)</h1>
@@ -237,7 +237,7 @@ export default function CartPage() {
           <div className="flex items-center gap-4">
             <Link
               href="/products"
-              className="flex items-center text-gray-600 hover:text-purple-600 transition-colors"
+              className="flex items-center text-gray-600 hover:text-yellow-600 transition-colors"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Continue Shopping
@@ -311,7 +311,7 @@ export default function CartPage() {
                             href={`/products/${product.slug || product._id}`}
                             className="block"
                           >
-                            <h3 className="font-semibold text-gray-900 hover:text-purple-600 transition-colors text-sm md:text-base line-clamp-2">
+                            <h3 className="font-semibold text-gray-900 hover:text-yellow-600 transition-colors text-sm md:text-base line-clamp-2">
                               {product.name || 'Unknown Product'}
                             </h3>
                           </Link>
@@ -431,19 +431,19 @@ export default function CartPage() {
 
             {/* Shopping Tips - Desktop */}
             <div className="hidden md:block mt-6">
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6">
+              <div className="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl p-6">
                 <h3 className="font-bold text-gray-900 mb-4 flex items-center">
-                  <Shield className="w-5 h-5 mr-2 text-purple-600" />
+                  <Shield className="w-5 h-5 mr-2 text-yellow-600" />
                   Shopping Benefits
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {[
-                    { icon: <Truck className="w-4 h-4" />, title: "Free Shipping", desc: "On orders over ₹499" },
+                    { icon: <Truck className="w-4 h-4" />, title: "Free Shipping", desc: "On orders over ₹1999" },
                     { icon: <RefreshCw className="w-4 h-4" />, title: "Easy Returns", desc: "7-day return policy" },
                     { icon: <CreditCard className="w-4 h-4" />, title: "Secure Payment", desc: "SSL encrypted checkout" }
                   ].map((benefit, idx) => (
                     <div key={idx} className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-purple-600">
+                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-yellow-600">
                         {benefit.icon}
                       </div>
                       <div>
@@ -467,12 +467,12 @@ export default function CartPage() {
                   className="w-full flex items-center justify-between p-4"
                 >
                   <div className="flex items-center">
-                    <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mr-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-yellow-500 to-amber-500 rounded-lg flex items-center justify-center mr-3">
                       <ShoppingBag className="w-4 h-4 text-white" />
                     </div>
                     <div className="text-left">
                       <div className="font-semibold text-gray-900">Order Summary</div>
-                      <div className="text-sm text-gray-600">₹{(totalPrice * 1.18).toFixed(2)} • {totalItems} items</div>
+                      <div className="text-sm text-gray-600">₹{totalPrice.toLocaleString()} • {totalItems} items</div>
                     </div>
                   </div>
                   {showOrderSummary ? (
@@ -497,32 +497,53 @@ export default function CartPage() {
                   
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping</span>
-                    <span className="font-medium text-green-600">FREE</span>
+                    <span className="font-medium text-green-600">
+                      {totalPrice >= 1999 ? 'FREE' : 'Calculated at checkout'}
+                    </span>
                   </div>
                   
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Tax (18% GST)</span>
-                    <span className="font-medium">₹{(totalPrice * 0.18).toFixed(2)}</span>
-                  </div>
+                  {/* Tax line removed */}
                   
                   <div className="border-t border-gray-200 pt-3">
                     <div className="flex justify-between">
                       <span className="text-lg font-bold text-gray-900">Total</span>
                       <div className="text-right">
                         <span className="text-2xl font-bold text-gray-900">
-                          ₹{(totalPrice * 1.18).toFixed(2)}
+                          ₹{totalPrice.toLocaleString()}
                         </span>
-                        <p className="text-xs text-gray-500 mt-1">Inclusive of all taxes</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {totalPrice >= 1999 ? 'Free shipping included' : 'Shipping calculated at checkout'}
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
 
+                {/* Free Shipping Progress */}
+                {totalPrice < 1999 && (
+                  <div className="mb-6 p-3 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-lg border border-yellow-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-yellow-900">
+                        Add ₹{(1999 - totalPrice).toLocaleString()} more for FREE shipping
+                      </span>
+                      <span className="text-sm font-bold text-yellow-700">
+                        {Math.round((totalPrice / 1999) * 100)}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-yellow-200 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-yellow-500 to-amber-500 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${Math.min(100, (totalPrice / 1999) * 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Checkout Button */}
                 <button
                   onClick={handleCheckout}
                   disabled={loading || cart.length === 0}
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 md:py-4 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg active:scale-95 mb-4"
+                  className="w-full bg-gradient-to-r from-yellow-500 to-amber-500 text-white py-3 md:py-4 rounded-xl hover:from-yellow-600 hover:to-amber-600 transition-all duration-300 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg active:scale-95 mb-4"
                 >
                   {loading ? (
                     <>
@@ -549,17 +570,17 @@ export default function CartPage() {
                 {/* Mobile Shopping Tips */}
                 <div className="md:hidden mt-6 pt-6 border-t border-gray-200">
                   <h3 className="font-bold text-gray-900 mb-4 flex items-center">
-                    <Shield className="w-5 h-5 mr-2 text-purple-600" />
+                    <Shield className="w-5 h-5 mr-2 text-yellow-600" />
                     Shopping Benefits
                   </h3>
                   <div className="space-y-3">
                     {[
-                      { icon: <Truck className="w-4 h-4" />, title: "Free Shipping", desc: "On orders over ₹499" },
+                      { icon: <Truck className="w-4 h-4" />, title: "Free Shipping", desc: "On orders over ₹1999" },
                       { icon: <RefreshCw className="w-4 h-4" />, title: "Easy Returns", desc: "7-day return policy" },
                       { icon: <CreditCard className="w-4 h-4" />, title: "Secure Payment", desc: "SSL encrypted checkout" }
                     ].map((benefit, idx) => (
                       <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-purple-600">
+                        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-yellow-600">
                           {benefit.icon}
                         </div>
                         <div>
@@ -578,7 +599,7 @@ export default function CartPage() {
                       <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center mr-3 flex-shrink-0">
                         <Check className="w-5 h-5 text-green-600" />
                       </div>
-                      <span>Free shipping on orders over ₹499</span>
+                      <span>Free shipping on orders over ₹1999</span>
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
                       <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center mr-3 flex-shrink-0">
@@ -587,8 +608,8 @@ export default function CartPage() {
                       <span>Secure payment & SSL encryption</span>
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
-                      <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center mr-3 flex-shrink-0">
-                        <Shield className="w-5 h-5 text-purple-600" />
+                      <div className="w-10 h-10 rounded-xl bg-yellow-100 flex items-center justify-center mr-3 flex-shrink-0">
+                        <Shield className="w-5 h-5 text-yellow-600" />
                       </div>
                       <span>7-day return policy</span>
                     </div>
@@ -602,13 +623,13 @@ export default function CartPage() {
               <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-20">
                 <div className="flex items-center justify-between mb-2">
                   <div>
-                    <div className="text-lg font-bold text-gray-900">₹{(totalPrice * 1.18).toFixed(2)}</div>
-                    <div className="text-xs text-gray-600">Total with tax</div>
+                    <div className="text-lg font-bold text-gray-900">₹{totalPrice.toLocaleString()}</div>
+                    <div className="text-xs text-gray-600">Total amount</div>
                   </div>
                   <button
                     onClick={handleCheckout}
                     disabled={loading || cart.length === 0}
-                    className="flex-1 ml-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg active:scale-95"
+                    className="flex-1 ml-4 bg-gradient-to-r from-yellow-500 to-amber-500 text-white py-3 rounded-xl hover:from-yellow-600 hover:to-amber-600 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg active:scale-95"
                   >
                     {loading ? (
                       <>
@@ -622,7 +643,7 @@ export default function CartPage() {
                 </div>
                 <button
                   onClick={() => setShowOrderSummary(true)}
-                  className="w-full text-sm text-center text-purple-600 font-medium"
+                  className="w-full text-sm text-center text-yellow-600 font-medium"
                 >
                   View order summary
                 </button>

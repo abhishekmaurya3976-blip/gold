@@ -14,7 +14,7 @@ import {
 import { categoryApi } from '../../lib/api/categories';
 import { productApi } from '../../lib/api/products';
 import CategoryCard from '../../components/shared/CategoryCard';
-import ProductGrid from '../../components/shared/ProductGrid';
+import ProductCard from '../../components/shared/ProductCard';
 import SortSelect from '../../components/shared/SortSelect';
 
 interface CategoryPageProps {
@@ -37,28 +37,13 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   
   return {
     title: `${category?.name || 'Premium Collection'} | Silver Shringar `,
-    description: category?.description || `Explore premium ${category?.name || 'art supplies'} collection`,
+    description: category?.description || `Explore premium ${category?.name || 'jewelry'} collection`,
   };
-}
-
-// Safe image helpers (always return strings)
-function getImageUrl(image: any): string {
-  if (!image) return '';
-  if (typeof image === 'string') return image;
-  if (typeof image === 'object') return image.url ?? image.src ?? '';
-  return '';
-}
-
-function getImageAlt(image: any, defaultAlt: string): string {
-  if (!image) return defaultAlt;
-  if (typeof image === 'object') return image.altText ?? image.alt ?? defaultAlt;
-  if (typeof image === 'string') return defaultAlt;
-  return defaultAlt;
 }
 
 function MobileFilterButton() {
   return (
-    <button className="md:hidden flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium text-sm w-full">
+    <button className="md:hidden flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-lg text-yellow-900 font-medium text-sm w-full hover:from-yellow-100 hover:to-amber-100 transition-all duration-300">
       <Filter className="w-4 h-4" />
       Filters
     </button>
@@ -124,12 +109,12 @@ async function ProductsContent({
     return (
       <div className="text-center py-12 md:py-16">
         <div className="relative w-20 h-20 md:w-24 md:h-24 mx-auto mb-6">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-amber-400 rounded-full"></div>
           <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
-            <Package className="w-8 h-8 md:w-10 md:h-10 text-gray-300" />
+            <Package className="w-8 h-8 md:w-10 md:h-10 text-yellow-300" />
           </div>
         </div>
-        <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-3">
+        <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-3 font-playfair">
           {searchQuery ? 'No Products Found' : 'No Products Available'}
         </h3>
         <p className="text-gray-600 mb-6 max-w-md mx-auto">
@@ -141,14 +126,14 @@ async function ProductsContent({
           {searchQuery && (
             <Link
               href={`/categories/${slug}`}
-              className="px-4 py-3 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors font-medium text-sm"
+              className="px-4 py-3 bg-gradient-to-r from-yellow-50 to-amber-50 text-yellow-900 rounded-lg hover:from-yellow-100 hover:to-amber-100 transition-colors font-medium text-sm border border-yellow-200"
             >
               Clear Search
             </Link>
           )}
           <Link
             href="/products"
-            className="px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm"
+            className="px-4 py-3 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-lg hover:from-yellow-600 hover:to-amber-600 transition-colors font-medium text-sm shadow-lg hover:shadow-xl"
           >
             Browse All Products
           </Link>
@@ -162,69 +147,19 @@ async function ProductsContent({
 
   return (
     <>
-      {/* Mobile grid: each tile wraps clickable parts in Link so mobile taps navigate */}
-      <div className="md:hidden">
-        <div className="grid grid-cols-2 gap-3">
-          {products.map((product) => {
-            const firstImage = product.images?.[0];
-            const imageUrl = getImageUrl(firstImage);
-            const imageAlt = getImageAlt(firstImage, product.name || 'Product');
-            const productSlugOrId = String(product.slug ?? product._id ?? '');
-
-            return (
-              <div key={product._id ?? productSlugOrId} className="w-full">
-                <div className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm h-full flex flex-col">
-                  {/* Link wraps the image + meta (so tapping goes to details) */}
-                  <Link href={`/products/${encodeURIComponent(productSlugOrId)}`} className="block">
-                    <div className="relative aspect-square w-full bg-gradient-to-br from-gray-50 to-gray-100 rounded-md mb-2 overflow-hidden">
-                      {imageUrl ? (
-                        // use native img tag for simple server-rendered mobile tile
-                        <img 
-                          src={imageUrl} 
-                          alt={imageAlt}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-100 to-pink-100">
-                          <Package className="w-6 h-6 text-white/60" />
-                        </div>
-                      )}
-                    </div>
-
-                    <h3 className="font-medium text-gray-900 mb-1 line-clamp-2 text-xs leading-tight min-h-[32px]">
-                      {product.name}
-                    </h3>
-                    <p className="text-xs font-bold text-gray-900 mb-2">
-                      ₹{(product.price ?? 0).toLocaleString()}
-                    </p>
-                  </Link>
-
-                  {/* Add to Cart - kept outside Link so it doesn't navigate */}
-                  <div className="mt-auto">
-                    <button className="w-full py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-medium rounded-md hover:from-purple-700 hover:to-pink-700 transition-all">
-                      Add to Cart
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-      
-      {/* Desktop: existing ProductGrid stays (assumed client rendering / clickable) */}
-      <div className="hidden md:block">
-        <ProductGrid 
-          products={products} 
-          loading={false}
-        />
+      {/* Products Grid - Using ProductCard for both mobile and desktop */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        {products.map((product) => (
+          <div key={product._id} className="transform hover:-translate-y-1 transition-transform duration-300">
+            <ProductCard product={product} />
+          </div>
+        ))}
       </div>
       
       {/* Pagination */}
       {productsData.totalPages > 1 && (
         <div className="mt-12 flex justify-center">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {page > 1 && (
               <Link
                 href={`/categories/${slug}?${new URLSearchParams({
@@ -232,7 +167,7 @@ async function ProductsContent({
                   ...(sortBy !== 'createdAt' && { sort: sortBy }),
                   ...(searchQuery && { search: searchQuery }),
                 }).toString()}`}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center text-sm"
+                className="px-4 py-2 bg-gradient-to-r from-yellow-50 to-amber-50 text-yellow-900 rounded-lg hover:from-yellow-100 hover:to-amber-100 transition-colors flex items-center text-sm border border-yellow-200 shadow-sm"
               >
                 ← Previous
               </Link>
@@ -250,10 +185,10 @@ async function ProductsContent({
                     ...(sortBy !== 'createdAt' && { sort: sortBy }),
                     ...(searchQuery && { search: searchQuery }),
                   }).toString()}`}
-                  className={`px-4 py-2 rounded-lg transition-colors text-sm ${
+                  className={`px-4 py-2 rounded-lg transition-colors text-sm shadow-sm ${
                     isActive
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                      ? 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-md'
+                      : 'bg-white border border-yellow-200 text-yellow-900 hover:bg-gradient-to-r hover:from-yellow-50 hover:to-amber-50'
                   }`}
                 >
                   {pageNum}
@@ -268,7 +203,7 @@ async function ProductsContent({
                   ...(sortBy !== 'createdAt' && { sort: sortBy }),
                   ...(searchQuery && { search: searchQuery }),
                 }).toString()}`}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center text-sm"
+                className="px-4 py-2 bg-gradient-to-r from-yellow-50 to-amber-50 text-yellow-900 rounded-lg hover:from-yellow-100 hover:to-amber-100 transition-colors flex items-center text-sm border border-yellow-200 shadow-sm"
               >
                 Next →
               </Link>
@@ -319,20 +254,20 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   }).catch(() => ({ total: 0 }));
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-gradient-to-b from-white to-yellow-50/30">
       {/* HEADER */}
-      <div className="bg-gradient-to-r from-purple-50 via-pink-50 to-blue-50 border-b border-gray-200">
+      <div className="bg-gradient-to-r from-yellow-50 via-amber-50 to-yellow-50 border-b border-yellow-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-24 pb-8 md:pb-12">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center shadow-xl">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-r from-yellow-500 to-yellow-600 flex items-center justify-center shadow-xl">
                 <Crown className="w-6 h-6 md:w-7 md:h-7 text-white" />
               </div>
-              <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-yellow-400" />
+              <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-yellow-300" />
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">
-                {category.name} <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">Collection</span>
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 font-playfair">
+                {category.name} <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-yellow-700">Collection</span>
               </h1>
               {category.description && (
                 <p className="text-gray-600 text-sm md:text-base mt-1 max-w-2xl">
@@ -345,15 +280,15 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
       </div>
 
       {/* BREADCRUMB */}
-      <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+      <div className="bg-gradient-to-r from-yellow-50/50 to-yellow-50/30 border-b border-yellow-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
           <nav className="flex items-center text-sm text-gray-600 overflow-x-auto">
-            <Link href="/" className="hover:text-purple-600 transition-colors flex items-center whitespace-nowrap">
+            <Link href="/" className="hover:text-yellow-700 transition-colors flex items-center whitespace-nowrap">
               <Crown className="w-3 h-3 mr-1" />
               Home
             </Link>
             <ChevronRight className="w-4 h-4 mx-2 text-gray-400 flex-shrink-0" />
-            <Link href="/categories" className="hover:text-purple-600 transition-colors whitespace-nowrap">
+            <Link href="/categories" className="hover:text-yellow-700 transition-colors whitespace-nowrap">
               Collections
             </Link>
             {parentCategory && (
@@ -361,7 +296,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 <ChevronRight className="w-4 h-4 mx-2 text-gray-400 flex-shrink-0" />
                 <Link 
                   href={`/categories/${parentCategory.slug}`}
-                  className="hover:text-purple-600 transition-colors whitespace-nowrap"
+                  className="hover:text-yellow-700 transition-colors whitespace-nowrap"
                 >
                   {parentCategory.name}
                 </Link>
@@ -382,14 +317,14 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
           <section className="mb-12 md:mb-16">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1 font-playfair">
                   Subcategories
                 </h2>
                 <p className="text-gray-600 text-sm">
                   Explore related collections
                 </p>
               </div>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-yellow-600 font-medium">
                 {subcategories.length} subcategories
               </div>
             </div>
@@ -410,7 +345,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         <section className="mb-12 md:mb-16">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1 font-playfair">
                 Products in {category.name}
               </h2>
               <p className="text-gray-600 text-sm">
@@ -418,7 +353,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
               </p>
             </div>
 
-            {/* Desktop Controls (unchanged) */}
+            {/* Desktop Controls */}
             <div className="hidden md:flex items-center gap-4">
               <form action={`/categories/${slug}`} method="GET" className="relative">
                 <input
@@ -426,15 +361,15 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                   name="search"
                   defaultValue={searchQuery}
                   placeholder="Search products..."
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 w-48 md:w-64 text-sm"
+                  className="pl-10 pr-4 py-2 border border-yellow-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 w-48 md:w-64 text-sm bg-white"
                 />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-yellow-400" />
                 {searchQuery && (
                   <Link 
                     href={`/categories/${slug}`}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2"
                   >
-                    <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                    <X className="w-4 h-4 text-yellow-400 hover:text-yellow-600" />
                   </Link>
                 )}
               </form>
@@ -448,9 +383,6 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             {/* Mobile Controls */}
             <div className="md:hidden w-full">
               <div className="flex flex-col gap-3">
-                {/* Mobile Filter Button */}
-                <MobileFilterButton />
-                
                 {/* Search and Sort Container for Mobile */}
                 <div className="flex flex-col xs:flex-row gap-3 w-full">
                   {/* Search for Mobile */}
@@ -461,15 +393,15 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                         name="search"
                         defaultValue={searchQuery}
                         placeholder="Search products..."
-                        className="pl-10 pr-8 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 w-full text-sm"
+                        className="pl-10 pr-8 py-2.5 border border-yellow-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 w-full text-sm bg-white"
                       />
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-yellow-400" />
                       {searchQuery && (
                         <Link 
                           href={`/categories/${slug}`}
                           className="absolute right-3 top-1/2 transform -translate-y-1/2"
                         >
-                          <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                          <X className="w-4 h-4 text-yellow-400 hover:text-yellow-600" />
                         </Link>
                       )}
                     </form>
@@ -483,6 +415,9 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                     />
                   </div>
                 </div>
+
+                {/* Mobile Filter Button */}
+                <MobileFilterButton />
               </div>
             </div>
           </div>
@@ -503,7 +438,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
           <section className="mb-12 md:mb-16">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1 font-playfair">
                   Related Collections
                 </h2>
                 <p className="text-gray-600 text-sm">
@@ -526,24 +461,24 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
         {/* PREMIUM CTA */}
         <section>
-          <div className="bg-gradient-to-r from-gray-900 to-black rounded-2xl p-8 text-center">
-            <h2 className="text-xl md:text-2xl font-bold text-white mb-4">
+          <div className="bg-gradient-to-r from-yellow-900 to-amber-900 rounded-2xl p-8 text-center">
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-4 font-playfair">
               Need More Options?
             </h2>
-            <p className="text-gray-300 text-sm md:text-base mb-6 max-w-2xl mx-auto">
-              Explore our complete collection of premium art supplies and stationery
+            <p className="text-yellow-100 text-sm md:text-base mb-6 max-w-2xl mx-auto">
+              Explore our complete collection of premium jewelry and diamonds
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link 
                 href="/products"
-                className="inline-flex items-center justify-center px-6 py-3 bg-white text-gray-900 font-medium rounded-lg hover:bg-gray-50 transition-all duration-300 group"
+                className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-medium rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 group shadow-lg hover:shadow-xl"
               >
                 Shop All Products
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link 
                 href="/categories"
-                className="inline-flex items-center justify-center px-6 py-3 border-2 border-white text-white font-medium rounded-lg hover:bg-white/10 transition-all duration-300"
+                className="inline-flex items-center justify-center px-6 py-3 border-2 border-yellow-400 text-yellow-400 font-medium rounded-lg hover:bg-yellow-400/10 transition-all duration-300"
               >
                 All Collections
               </Link>

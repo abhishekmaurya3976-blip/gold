@@ -1,4 +1,4 @@
-// app/page.tsx - UPDATED VERSION WITH LARGER CIRCULAR CATEGORIES FOR DESKTOP
+// app/page.tsx - UPDATED VERSION WITH 20 CATEGORIES AND FIXED SKELETON
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
@@ -32,7 +32,7 @@ import { Product } from '../types/product';
 import ProductCard from './components/shared/ProductCard';
 import CustomerReviewsSlider from './components/shared/CustomerReviewsSlider';
 
-// Skeleton Components (keep same)
+// Skeleton Components - UPDATED FOR 20 CATEGORIES
 const SliderSkeleton = () => (
   <div className="relative w-full aspect-[16/6] md:aspect-[21/8] lg:aspect-[24/8] bg-gradient-to-br from-yellow-50 to-amber-50 animate-pulse rounded-xl overflow-hidden">
     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
@@ -41,8 +41,11 @@ const SliderSkeleton = () => (
 
 const CategoryCardSkeleton = () => (
   <div className="flex flex-col items-center group">
-    <div className="relative w-40 h-40 md:w-48 md:h-48 lg:w-64 xl:w-72 xl:h-72 rounded-full bg-gradient-to-br from-yellow-100 via-amber-100 to-yellow-50 animate-pulse border-4 border-yellow-200 shadow-lg"></div>
-    <div className="mt-6 h-6 w-32 bg-gradient-to-r from-yellow-200 to-amber-200 rounded-lg animate-pulse"></div>
+    <div className="relative w-36 h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 xl:w-48 xl:h-48 rounded-full bg-gradient-to-br from-yellow-100 via-amber-100 to-yellow-50 animate-pulse border-4 border-yellow-200 shadow-lg"></div>
+    <div className="mt-4 w-24 md:w-28 lg:w-32">
+      <div className="h-4 bg-gradient-to-r from-yellow-200 to-amber-200 rounded-lg animate-pulse mb-2"></div>
+      <div className="h-3 bg-yellow-200/50 rounded-lg animate-pulse w-3/4 mx-auto"></div>
+    </div>
   </div>
 );
 
@@ -302,7 +305,8 @@ export default function HomePage() {
     setCurrentSlide(index);
   }, []);
 
-  const featuredCategories = categories.filter(cat => !cat.parentId).slice(0, 8);
+  // Get 20 categories instead of 8
+  const featuredCategories = categories.filter(cat => !cat.parentId).slice(0, 20);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-yellow-50/30">
@@ -320,7 +324,7 @@ export default function HomePage() {
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 lg:py-16">
-          {/* Premium Categories Section - ENHANCED CIRCULAR DESIGN */}
+          {/* Premium Categories Section - SHOW 20 CATEGORIES */}
           <section className="mb-16 md:mb-20 lg:mb-24">
             <div className="text-center mb-10 md:mb-14">
               <div className="inline-flex items-center justify-center mb-4 md:mb-6">
@@ -346,36 +350,36 @@ export default function HomePage() {
             </div>
 
             {!isCategoriesLoaded ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8 lg:gap-12 justify-items-center">
-                {[...Array(4)].map((_, i) => (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6 lg:gap-8 justify-items-center">
+                {[...Array(20)].map((_, i) => (
                   <CategoryCardSkeleton key={i} />
                 ))}
               </div>
             ) : featuredCategories.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8 lg:gap-12 justify-items-center">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6 lg:gap-8 justify-items-center">
                 {featuredCategories.map((category, index) => (
                   <div key={category._id} className="flex flex-col items-center group">
                     <Link
                       href={`/categories/${category.slug || category._id || '#'}`}
                       className="block relative w-full h-full"
                     >
-                      <div className="relative w-40 h-40 md:w-48 md:h-48 lg:w-64 lg:h-64 xl:w-72 xl:h-72 rounded-full overflow-hidden shadow-2xl group-hover:shadow-3xl transition-all duration-500 transform group-hover:scale-105 border-4 lg:border-6 border-yellow-300">
+                      <div className="relative w-36 h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 xl:w-48 xl:h-48 rounded-full overflow-hidden shadow-xl group-hover:shadow-2xl transition-all duration-500 transform group-hover:scale-105 border-4 border-yellow-300">
                         {category.image ? (
                           <Image
                             src={typeof category.image === 'string' ? category.image : (category.image as any).url || ''}
                             alt={category.name}
                             fill
                             className="object-cover transition-transform duration-700 group-hover:scale-110"
-                            sizes="(max-width: 640px) 160px, (max-width: 768px) 192px, (max-width: 1024px) 256px, 288px"
-                            priority={index < 3}
-                            quality={90}
-                            loading={index < 3 ? 'eager' : 'lazy'}
+                            sizes="(max-width: 640px) 144px, (max-width: 768px) 160px, (max-width: 1024px) 176px, 192px"
+                            priority={index < 10}
+                            quality={85}
+                            loading={index < 10 ? 'eager' : 'lazy'}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-yellow-100 via-amber-100 to-yellow-50">
                             <div className="text-center">
-                              <Gem className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-yellow-400 mb-2" />
-                              <span className="text-yellow-600 text-sm font-medium">Jewelry</span>
+                              <Gem className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 text-yellow-400 mb-2" />
+                              <span className="text-yellow-600 text-xs font-medium">Jewelry</span>
                             </div>
                           </div>
                         )}
@@ -383,39 +387,33 @@ export default function HomePage() {
                         
                         {/* Premium Hover Overlay */}
                         <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full flex items-center justify-center">
-                          <div className="bg-yellow-600/90 backdrop-blur-sm w-14 h-14 lg:w-16 lg:h-16 rounded-full flex items-center justify-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                            <ArrowRight className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
+                          <div className="bg-yellow-600/90 backdrop-blur-sm w-10 h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                            <ArrowRight className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                           </div>
                         </div>
 
                         {/* Premium Badge for Featured Categories */}
-                        <div className="absolute top-3 right-3 lg:top-4 lg:right-4">
-                          <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-r from-yellow-500 to-amber-500 flex items-center justify-center shadow-lg">
-                            <Star className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+                        <div className="absolute top-2 right-2 lg:top-3 lg:right-3">
+                          <div className="w-6 h-6 lg:w-8 lg:h-8 rounded-full bg-gradient-to-r from-yellow-500 to-amber-500 flex items-center justify-center shadow-lg">
+                            <Star className="w-3 h-3 lg:w-4 lg:h-4 text-white" />
                           </div>
                         </div>
                       </div>
 
                       {/* Premium Glow Effect */}
-                      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400/30 via-transparent to-yellow-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" />
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400/20 via-transparent to-yellow-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
                     </Link>
                     
                     {/* Category Name with Enhanced Styling */}
-                    <div className="mt-8 text-center px-2">
-                      <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900 mb-3 group-hover:text-yellow-700 transition-colors duration-300 font-playfair">
+                    <div className="mt-4 text-center px-1">
+                      <h3 className="text-sm md:text-base lg:text-lg font-bold text-gray-900 mb-1 group-hover:text-yellow-700 transition-colors duration-300 font-playfair line-clamp-1">
                         {category.name}
                       </h3>
                       {category.description && (
-                        <p className="text-gray-600 text-sm md:text-base lg:text-lg max-w-[220px] xl:max-w-[250px] mx-auto line-clamp-2">
+                        <p className="text-gray-600 text-xs md:text-sm lg:text-base max-w-[140px] xl:max-w-[160px] mx-auto line-clamp-2">
                           {category.description}
                         </p>
                       )}
-                      {/* <div className="mt-4">
-                        <span className="inline-flex items-center text-yellow-600 text-sm md:text-base font-semibold group-hover:text-yellow-700 transition-colors duration-300">
-                          Shop Collection
-                          <ArrowRight className="w-4 h-4 lg:w-5 lg:h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
-                        </span>
-                      </div> */}
                     </div>
                   </div>
                 ))}
@@ -432,6 +430,20 @@ export default function HomePage() {
                 <p className="text-gray-600 max-w-md mx-auto text-lg">
                   We're curating exclusive jewelry collections for you
                 </p>
+              </div>
+            )}
+
+            {/* View All Categories Button */}
+            {isCategoriesLoaded && featuredCategories.length > 0 && (
+              <div className="mt-12 text-center">
+                <Link
+                  href="/categories"
+                  className="inline-flex items-center bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl group"
+                >
+                  <Crown className="w-5 h-5 mr-3" />
+                  View All Categories
+                  <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-2 transition-transform" />
+                </Link>
               </div>
             )}
           </section>

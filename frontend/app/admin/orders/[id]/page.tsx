@@ -65,8 +65,7 @@ interface Order {
   orderStatus: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   subtotal: number;
   shippingFee: number;
-  tax: number;
-  total: number;
+  total: number; // Note: Removed tax field from calculation
   orderNotes?: string;
   adminNotes?: string;
   trackingNumber?: string;
@@ -106,7 +105,12 @@ export default function AdminOrderDetailsPage() {
       
       if (response.success && response.data?.order) {
         const orderData = response.data.order;
-        setOrder(orderData);
+        // Ensure total is calculated correctly without tax
+        const orderWithCorrectTotal = {
+          ...orderData,
+          total: orderData.subtotal + orderData.shippingFee
+        };
+        setOrder(orderWithCorrectTotal);
         setAdminNotes(orderData.adminNotes || '');
         setTrackingNumber(orderData.trackingNumber || '');
         setShippingProvider(orderData.shippingProvider || '');
@@ -235,7 +239,7 @@ export default function AdminOrderDetailsPage() {
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --brand: #6D28D9; /* purple-600 */
+    --brand: #D97706; /* amber-600 */
     --muted: #6B7280;
     --bg: #fff;
   }
@@ -281,7 +285,7 @@ export default function AdminOrderDetailsPage() {
   <div class="page" id="invoice">
     <header>
       <div class="brand">
-        <div style="width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#7C3AED,#EC4899);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">AS</div>
+        <div style="width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#D97706,#F59E0B);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">SS</div>
         <div>
           <div class="title">Silver Shringar Admin</div>
           <div class="small">Invoice for Order</div>
@@ -359,9 +363,8 @@ export default function AdminOrderDetailsPage() {
         <div class="box">
           <div style="display:flex;justify-content:space-between"><div class="small">Subtotal</div><div>₹${formatNumber(o.subtotal)}</div></div>
           <div style="display:flex;justify-content:space-between;margin-top:6px;"><div class="small">Shipping</div><div>${o.shippingFee === 0 ? 'FREE' : '₹' + formatNumber(o.shippingFee)}</div></div>
-          <div style="display:flex;justify-content:space-between;margin-top:6px;"><div class="small">Tax (18% GST)</div><div>₹${formatNumber(o.tax)}</div></div>
           <hr style="border:none;border-top:1px dashed #E6EEF8;margin:10px 0;">
-          <div style="display:flex;justify-content:space-between;font-weight:700;font-size:16px;"><div>Total</div><div>₹${formatNumber(o.total)}</div></div>
+          <div style="display:flex;justify-content:space-between;font-weight:700;font-size:16px;"><div>Total Amount</div><div>₹${formatNumber(o.total)}</div></div>
         </div>
       </div>
 
@@ -371,7 +374,7 @@ export default function AdminOrderDetailsPage() {
     </div>
 
     <footer style="margin-top:22px; font-size:12px; color:var(--muted);">
-      <div>ARTNSTUFF • Support: support@example.com • +91 98765 43210</div>
+      <div>Silver Shringar • Support: support@silvershringar.com • +91 98765 43210</div>
       <div style="margin-top:4px; font-size:11px;">This is an internal admin invoice copy</div>
     </footer>
   </div>
@@ -424,7 +427,7 @@ export default function AdminOrderDetailsPage() {
     return [
       { value: 'pending', label: 'Pending', color: 'text-yellow-600', icon: <Clock className="w-4 h-4" /> },
       { value: 'confirmed', label: 'Confirmed', color: 'text-blue-600', icon: <CheckCircle className="w-4 h-4" /> },
-      { value: 'processing', label: 'Processing', color: 'text-purple-600', icon: <Package className="w-4 h-4" /> },
+      { value: 'processing', label: 'Processing', color: 'text-amber-600', icon: <Package className="w-4 h-4" /> },
       { value: 'shipped', label: 'Shipped', color: 'text-indigo-600', icon: <Truck className="w-4 h-4" /> },
       { value: 'delivered', label: 'Delivered', color: 'text-green-600', icon: <Home className="w-4 h-4" /> },
       { value: 'cancelled', label: 'Cancelled', color: 'text-red-600', icon: <XCircle className="w-4 h-4" /> }
@@ -435,7 +438,7 @@ export default function AdminOrderDetailsPage() {
     switch (status) {
       case 'pending': return 'bg-yellow-100 text-yellow-800';
       case 'confirmed': return 'bg-blue-100 text-blue-800';
-      case 'processing': return 'bg-purple-100 text-purple-800';
+      case 'processing': return 'bg-amber-100 text-amber-800';
       case 'shipped': return 'bg-indigo-100 text-indigo-800';
       case 'delivered': return 'bg-green-100 text-green-800';
       case 'cancelled': return 'bg-red-100 text-red-800';
@@ -452,7 +455,7 @@ export default function AdminOrderDetailsPage() {
       <div className="min-h-screen bg-gray-50 pt-20 md:pt-24">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 md:py-12">
           <div className="text-center">
-            <RefreshCw className="w-10 h-10 md:w-12 md:h-12 text-purple-600 animate-spin mx-auto mb-3 md:mb-4" />
+            <RefreshCw className="w-10 h-10 md:w-12 md:h-12 text-amber-600 animate-spin mx-auto mb-3 md:mb-4" />
             <p className="text-gray-600 text-sm md:text-base">Loading order details...</p>
           </div>
         </div>
@@ -470,7 +473,7 @@ export default function AdminOrderDetailsPage() {
             <p className="text-gray-600 text-sm md:text-base mb-4 md:mb-6">{error || 'The order you are looking for does not exist.'}</p>
             <Link
               href="/admin/orders"
-              className="inline-flex items-center px-4 py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors font-medium text-sm md:text-base"
+              className="inline-flex items-center px-4 py-2.5 md:px-6 md:py-3 bg-gradient-to-r from-amber-600 to-yellow-600 text-white rounded-lg hover:from-amber-700 hover:to-yellow-700 transition-colors font-medium text-sm md:text-base"
             >
               <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 mr-1.5 md:mr-2" />
               Back to Orders
@@ -489,11 +492,11 @@ export default function AdminOrderDetailsPage() {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-2 md:py-4">
           <nav className="flex items-center text-xs md:text-sm text-gray-600">
-            <Link href="/admin" className="hover:text-purple-600 transition-colors">
+            <Link href="/admin" className="hover:text-amber-600 transition-colors">
               Dashboard
             </Link>
             <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1.5 md:mx-2 text-gray-400" />
-            <Link href="/admin/orders" className="hover:text-purple-600 transition-colors">
+            <Link href="/admin/orders" className="hover:text-amber-600 transition-colors">
               Orders
             </Link>
             <ChevronRight className="w-3 h-3 md:w-4 md:h-4 mx-1.5 md:mx-2 text-gray-400" />
@@ -590,7 +593,7 @@ export default function AdminOrderDetailsPage() {
                       disabled={updating || order.orderStatus === option.value}
                       className={`w-full p-3 border rounded-lg flex items-center justify-between ${
                         order.orderStatus === option.value
-                          ? 'border-2 border-purple-500 bg-purple-50'
+                          ? 'border-2 border-amber-500 bg-amber-50'
                           : 'border-gray-300 hover:bg-gray-50'
                       } disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white`}
                     >
@@ -601,7 +604,7 @@ export default function AdminOrderDetailsPage() {
                         <span className={`font-medium text-sm ${option.color}`}>{option.label}</span>
                       </div>
                       {updating && order.orderStatus === option.value && (
-                        <RefreshCw className="w-3 h-3 animate-spin text-purple-600" />
+                        <RefreshCw className="w-3 h-3 animate-spin text-amber-600" />
                       )}
                     </button>
                   ))}
@@ -710,7 +713,7 @@ export default function AdminOrderDetailsPage() {
                           disabled={updating || order.orderStatus === option.value}
                           className={`flex-1 min-w-[120px] p-3 border rounded-lg flex flex-col items-center justify-center gap-2 ${
                             order.orderStatus === option.value
-                              ? 'border-2 border-purple-500 bg-purple-50'
+                              ? 'border-2 border-amber-500 bg-amber-50'
                               : 'border-gray-300 hover:bg-gray-50'
                           } disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white`}
                         >
@@ -800,7 +803,7 @@ export default function AdminOrderDetailsPage() {
                 ) : (
                   <button
                     onClick={() => setEditingAdminNotes(true)}
-                    className="p-1 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                    className="p-1 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
                     title="Edit Notes"
                   >
                     <Edit className="w-3 h-3 md:w-4 md:h-4" />
@@ -813,7 +816,7 @@ export default function AdminOrderDetailsPage() {
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 text-sm md:px-4 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-3 py-2 text-sm md:px-4 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   placeholder="Add internal notes about this order..."
                 />
               ) : (
@@ -857,11 +860,6 @@ export default function AdminOrderDetailsPage() {
                       <span className="font-medium text-sm">{order.shippingFee === 0 ? 'FREE' : `₹${order.shippingFee.toLocaleString()}`}</span>
                     </div>
                     
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 text-sm">Tax (18% GST)</span>
-                      <span className="font-medium text-sm">₹{order.tax.toLocaleString()}</span>
-                    </div>
-                    
                     <div className="border-t border-gray-200 pt-2">
                       <div className="flex justify-between">
                         <span className="font-bold text-gray-900">Total Amount</span>
@@ -869,7 +867,7 @@ export default function AdminOrderDetailsPage() {
                           <span className="text-lg font-bold text-gray-900">
                             ₹{order.total.toLocaleString()}
                           </span>
-                          <p className="text-xs text-gray-500">Inclusive of all taxes</p>
+                          <p className="text-xs text-gray-500">Exclusive of any taxes</p>
                         </div>
                       </div>
                     </div>
@@ -978,11 +976,6 @@ export default function AdminOrderDetailsPage() {
                     <span className="font-medium">{order.shippingFee === 0 ? 'FREE' : `₹${order.shippingFee.toLocaleString()}`}</span>
                   </div>
                   
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Tax (18% GST)</span>
-                    <span className="font-medium">₹{order.tax.toLocaleString()}</span>
-                  </div>
-                  
                   <div className="border-t border-gray-200 pt-3">
                     <div className="flex justify-between">
                       <span className="text-lg font-bold text-gray-900">Total Amount</span>
@@ -990,7 +983,7 @@ export default function AdminOrderDetailsPage() {
                         <span className="text-2xl font-bold text-gray-900">
                           ₹{order.total.toLocaleString()}
                         </span>
-                        <p className="text-xs text-gray-500">Inclusive of all taxes</p>
+                        <p className="text-xs text-gray-500">Exclusive of any taxes</p>
                       </div>
                     </div>
                   </div>
@@ -1068,7 +1061,7 @@ export default function AdminOrderDetailsPage() {
               {order.orderNotes && (
                 <div className="bg-white rounded-xl border border-gray-200 p-6">
                   <div className="flex items-center gap-2 mb-4">
-                    <MessageSquare className="w-5 h-5 text-purple-600" />
+                    <MessageSquare className="w-5 h-5 text-amber-600" />
                     <h2 className="text-xl font-bold text-gray-900">Customer Notes</h2>
                   </div>
                   
