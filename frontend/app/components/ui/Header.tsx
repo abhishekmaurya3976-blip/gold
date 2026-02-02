@@ -164,7 +164,7 @@ export default function Header() {
                     </span>
                     <span className="text-xs text-yellow-600 font-medium tracking-[0.3em] uppercase flex items-center">
                       <Gem className="w-3 h-3 mr-2" />
-                      Luxury Jewelry & Diamonds
+                      Luxury Silver Jewelry 
                     </span>
                   </div>
                 </Link>

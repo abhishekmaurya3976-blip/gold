@@ -36,8 +36,8 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const category = await categoryApi.getBySlug(slug);
   
   return {
-    title: `${category?.name || 'Premium Collection'} | Silver Shringar `,
-    description: category?.description || `Explore premium ${category?.name || 'jewelry'} collection`,
+    title: `${category?.name || 'Premium Categories'} | Silver Shringar `,
+    description: category?.description || `Explore premium ${category?.name || 'jewelry'} Categories`,
   };
 }
 
@@ -267,7 +267,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             </div>
             <div>
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 font-playfair">
-                {category.name} <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-yellow-700">Collection</span>
+                {category.name} <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-yellow-700">Categories</span>
               </h1>
               {category.description && (
                 <p className="text-gray-600 text-sm md:text-base mt-1 max-w-2xl">
@@ -289,7 +289,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             </Link>
             <ChevronRight className="w-4 h-4 mx-2 text-gray-400 flex-shrink-0" />
             <Link href="/categories" className="hover:text-yellow-700 transition-colors whitespace-nowrap">
-              Collections
+              Categories
             </Link>
             {parentCategory && (
               <>
@@ -321,7 +321,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                   Subcategories
                 </h2>
                 <p className="text-gray-600 text-sm">
-                  Explore related collections
+                  Explore related Categories
                 </p>
               </div>
               <div className="text-sm text-yellow-600 font-medium">
@@ -480,7 +480,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 href="/categories"
                 className="inline-flex items-center justify-center px-6 py-3 border-2 border-yellow-400 text-yellow-400 font-medium rounded-lg hover:bg-yellow-400/10 transition-all duration-300"
               >
-                All Collections
+                All Categories
               </Link>
             </div>
           </div>

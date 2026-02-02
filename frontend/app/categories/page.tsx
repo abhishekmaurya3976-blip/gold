@@ -167,7 +167,7 @@ export default async function CategoriesPage() {
               Home
             </Link>
             <ChevronRight className="w-4 h-4 mx-2 text-gray-400" />
-            <span className="text-gray-900 font-medium">Collections</span>
+            <span className="text-gray-900 font-medium">Categories</span>
           </nav>
         </div>
       </div>
@@ -181,7 +181,7 @@ export default async function CategoriesPage() {
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"></div>
                 <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">
-                  All Collections
+                  All Categories
                 </h2>
               </div>
               <p className="text-gray-600 text-sm md:text-base">
@@ -254,5 +254,5 @@ async function CategoryCount({ categoriesPromise }: { categoriesPromise: Promise
   const activeCategories = categories.filter(cat => cat.isActive);
   const parentCategories = activeCategories.filter(cat => !cat.parentId);
   
-  return <>{parentCategories.length} Our  Collections</>;
+  return <>{parentCategories.length} Our  Categories</>;
 }

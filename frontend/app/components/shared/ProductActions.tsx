@@ -78,7 +78,7 @@ export default function ProductActions({ product }: ProductActionsProps) {
         <button
           onClick={handleAddToCart}
           disabled={product.stock === 0}
-          className={`flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2.5 sm:py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-medium flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 group ${
+          className={`flex-1 bg-gradient-to-r from-yellow-600 to-amber-600 text-white py-2.5 sm:py-3 rounded-lg hover:from-yellow-700 hover:to-amber-700 transition-all duration-300 font-medium flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 group ${
             product.stock === 0 ? 'opacity-50 cursor-not-allowed' : ''
           } ${isAdded ? 'bg-green-500 hover:bg-green-600' : ''}`}
         >
