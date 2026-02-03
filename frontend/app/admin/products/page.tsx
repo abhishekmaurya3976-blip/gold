@@ -194,10 +194,10 @@ export default function AdminProductsPage() {
             <Filter className="w-5 h-5 mr-2" />
             Filters
           </button>
-          <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+          {/* <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
             <Download className="w-5 h-5 mr-2" />
             Export
-          </button>
+          </button> */}
           <Link
             href="/admin/products/new"
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
