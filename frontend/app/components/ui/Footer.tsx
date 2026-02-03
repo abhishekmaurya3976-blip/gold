@@ -229,9 +229,9 @@ export default function Footer() {
               </div>
               <div>
                 <div className="text-xs text-yellow-200/70 mb-1">Store Timings</div>
-                <div className="text-yellow-50 font-bold mb-1">10:30 AM - 8:30 PM</div>
-                <div className="text-sm text-yellow-100/90">Monday to Sunday</div>
-                <div className="text-sm text-yellow-100/90">(Open all days including festivals)</div>
+                <div className="text-yellow-50 font-bold mb-1">9:00 AM - 9:00 PM</div>
+                <div className="text-sm text-yellow-100/90">Sunday to Saturday</div>
+                <div className="text-sm text-yellow-100/90">(Monday shop will be clodes)</div>
               </div>
             </div>
 
@@ -283,10 +283,6 @@ export default function Footer() {
             </div>
             
             <div className="flex flex-col items-center md:items-end space-y-3">
-              <div className="text-yellow-200/60 text-xs text-center md:text-right max-w-md">
-                <p className="font-medium mb-1">Shree Shyam Jewellers</p>
-                <p>Shop No 4, Ram Nagar, Ranawat Height 2 • Mira Road East, Thane 401105</p>
-              </div>
               
               <a 
                 href="https://www.arnavcreativesolutions.com" 

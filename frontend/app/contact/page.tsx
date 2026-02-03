@@ -49,13 +49,13 @@ export default function ContactPage() {
   };
 
   const businessHours = [
-    { day: 'Monday', time: '10:30 AM - 8:30 PM' },
-    { day: 'Tuesday', time: '10:30 AM - 8:30 PM' },
-    { day: 'Wednesday', time: '10:30 AM - 8:30 PM' },
-    { day: 'Thursday', time: '10:30 AM - 8:30 PM' },
-    { day: 'Friday', time: '10:30 AM - 8:30 PM' },
-    { day: 'Saturday', time: '10:30 AM - 8:30 PM' },
-    { day: 'Sunday', time: '10:30 AM - 8:30 PM' },
+    { day: 'Sunday', time: '9:00 AM - 9:00 PM' },
+    { day: 'Tuesday', time: '9:00 AM - 9:00 PM' },
+    { day: 'Wednesday', time: '9:00 AM - 9:00 PM' },
+    { day: 'Thursday', time: '9:00 AM - 9:00 PM' },
+    { day: 'Friday', time: '9:00 AM - 9:00 PM' },
+    { day: 'Saturday', time: '9:00 AM - 9:00 PM' },
+    // Monday is closed
   ];
 
   const socialMedia = [
@@ -204,7 +204,7 @@ export default function ContactPage() {
               </a>
             </div>
 
-            {/* Business Hours */}
+            {/* Business Hours - UPDATED */}
             <div className="bg-white rounded-2xl p-8 shadow-xl border border-yellow-100 hover:shadow-2xl transition-all duration-300 group">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                 <Clock className="w-7 h-7 text-white" />
@@ -217,11 +217,16 @@ export default function ContactPage() {
                     <span className="text-gray-600 font-medium">{schedule.time}</span>
                   </div>
                 ))}
+                {/* Monday closed explicitly */}
+                <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                  <span className="text-gray-700 font-medium text-red-600">Monday</span>
+                  <span className="text-gray-600 font-medium">Closed</span>
+                </div>
               </div>
               <div className="mt-6 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                 <p className="text-yellow-700 text-sm font-medium flex items-center">
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Open 7 days a week including festivals
+                  Open Sunday to Saturday (Monday closed)
                 </p>
               </div>
             </div>
@@ -356,7 +361,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* FAQ Section */}
+      {/* FAQ Section - Updated */}
       <section className="py-20 px-4 md:px-6 lg:px-8 xl:px-20 bg-gradient-to-b from-yellow-50/20 to-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
@@ -397,21 +402,11 @@ export default function ContactPage() {
                 What are your store timings?
               </h3>
               <p className="text-gray-600">
-                We're open <strong>7 days a week</strong> from <strong>10:30 AM to 8:30 PM</strong>, 
-                including Sundays and all festivals. You're always welcome to visit our store.
+                We're open from <strong>9:00 AM to 9:00 PM</strong> on <strong>Sunday, Tuesday, Wednesday, Thursday, Friday, and Saturday</strong>. 
+                We are <strong className="text-red-600">closed on Mondays</strong>.
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-yellow-100">
-              <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center">
-                <Diamond className="w-5 h-5 text-yellow-600 mr-3" />
-                Do you provide diamond certification?
-              </h3>
-              <p className="text-gray-600">
-                Yes, all our diamonds come with proper certification. We offer both <strong className="text-yellow-600">natural and lab-grown diamonds</strong> 
-                with complete documentation of the 4Cs (Cut, Color, Clarity, Carat).
-              </p>
-            </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-lg border border-yellow-100">
               <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center">
