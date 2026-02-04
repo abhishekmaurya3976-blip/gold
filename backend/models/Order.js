@@ -211,11 +211,11 @@ orderSchema.index({ 'payment.status': 1 });
 orderSchema.index({ createdAt: -1 });
 orderSchema.index({ 'payment.razorpayOrderId': 1 });
 
-// Static method to calculate order totals
+// In Order model, update calculateTotals:
 orderSchema.statics.calculateTotals = function(items) {
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shippingFee = subtotal > 499 ? 0 : 50;
-  const tax = subtotal * 0.18;
+  const shippingFee = subtotal > 1999 ? 0 : 50;
+  const tax = 0; // Changed from 18% to 0%
   const total = subtotal + shippingFee + tax;
 
   return { subtotal, shippingFee, tax, total };

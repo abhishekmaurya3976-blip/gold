@@ -245,7 +245,7 @@ export default function Footer() {
                 <div className="text-yellow-50 font-bold mb-1">BIS Hallmarked Gold</div>
                 <div className="text-sm text-yellow-100/90">Certified Diamonds</div>
                 <div className="text-sm text-yellow-100/90">7-Day Return Policy</div>
-                <div className="text-sm text-yellow-100/90">Free Shipping*</div>
+                <div className="text-sm text-yellow-100/90">Free Shipping</div>
               </div>
             </div>
           </div>

@@ -1133,29 +1133,37 @@ export default function OrderDetailsPage() {
               </div>
 
               {/* Need Help */}
+                {/* Need Help */}
               <div className="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-xl border border-yellow-200 p-6">
                 <h3 className="font-bold text-gray-900 mb-3">Need Help?</h3>
                 <p className="text-gray-700 mb-4 text-sm">
                   If you have any questions about your order, please contact our customer support.
                 </p>
-                <button className="w-full py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors font-medium flex items-center justify-center gap-2">
+                <Link
+                  href="/contact"
+                  className="w-full py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors font-medium flex items-center justify-center gap-2"
+                >
                   <ExternalLink className="w-4 h-4" />
                   Contact Support
-                </button>
+                </Link>
               </div>
             </div>
 
             {/* Mobile Need Help */}
-            <div className="md:hidden bg-gradient-to-r from-yellow-50 to-amber-50 rounded-lg border border-yellow-200 p-4">
+             <div className="md:hidden bg-gradient-to-r from-yellow-50 to-amber-50 rounded-lg border border-yellow-200 p-4">
               <h3 className="font-bold text-gray-900 mb-2">Need Help?</h3>
               <p className="text-gray-700 mb-3 text-sm">
                 Questions about your order? Contact our customer support.
               </p>
-              <button className="w-full py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors font-medium text-sm flex items-center justify-center gap-2">
+              <Link
+                href="/contact"
+                className="w-full py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors font-medium text-sm flex items-center justify-center gap-2"
+              >
                 <ExternalLink className="w-4 h-4" />
                 Contact Support
-              </button>
+              </Link>
             </div>
+                
           </div>
         </div>
       </div>

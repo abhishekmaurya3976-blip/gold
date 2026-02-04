@@ -109,11 +109,12 @@ exports.createOrder = async (req, res) => {
       });
     }
 
-    // Calculate totals
-    const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shippingFee = subtotal > 499 ? 0 : 50;
-    const tax = subtotal * 0.18;
-    const total = subtotal + shippingFee + tax;
+    // Calculate totals - REMOVE TAX
+     const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+     const shippingFee = subtotal > 1999 ? 0 : 50;
+     const tax = 0; // Set tax to 0
+     const total = subtotal + shippingFee + tax; // Only subtotal + shipping
+
 
     // Create order with pending payment
     const order = new Order({
