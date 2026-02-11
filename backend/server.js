@@ -26,7 +26,7 @@ connectDB();
 
 // ✅ FIXED CORS Configuration
 const allowedOrigins = [
-  'creativejewelry.netlify.app/',
+  'https://creativejewelry.netlify.app/',
   'http://silvershringar.com/',// Add this
   'https://localhost:3000',
   // Optional: add more if needed
